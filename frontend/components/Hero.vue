@@ -167,7 +167,7 @@
       </div>
 
       <!-- Social Media - Mobile FAB -->
-      <div class="md:hidden fixed bottom-32 right-4 z-30">
+      <div class="md:hidden fixed bottom-40 right-4 z-30">
         <!-- Social Icons Container (expandable) -->
         <div class="transition-all duration-500 ease-out"
              :class="{ 'transform translate-y-0 opacity-100': showMobileSocial, 'transform translate-y-4 opacity-0 pointer-events-none': !showMobileSocial }">
