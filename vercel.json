@@ -1,8 +1,7 @@
 {
-  "installCommand": "cd frontend && npm install",
-  "buildCommand": "cd frontend && npm run build",
-  "outputDirectory": "frontend/.vercel/output/static",
   "framework": "nuxtjs",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".output/public",
   "env": {
     "NUXT_PUBLIC_SITE_URL": "https://andyjaquecl.vercel.app"
   }

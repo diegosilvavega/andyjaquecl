@@ -3,11 +3,6 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   devtools: { enabled: false }, // Deshabilitado para mejorar rendimiento
   
-  // Configuración de Nitro para Vercel
-  nitro: {
-    preset: 'vercel'
-  },
-  
   // Optimizaciones de rendimiento
   experimental: {
     payloadExtraction: false,
