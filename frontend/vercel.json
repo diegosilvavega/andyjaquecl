@@ -2,11 +2,6 @@
   "framework": "nuxtjs",
   "buildCommand": "npm run build",
   "outputDirectory": ".output/public",
-  "functions": {
-    "app/server/index.mjs": {
-      "maxDuration": 10
-    }
-  },
   "routes": [
     {
       "src": "/.*",
