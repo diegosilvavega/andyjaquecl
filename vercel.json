@@ -1,7 +1,7 @@
 {
   "framework": "nuxtjs",
   "buildCommand": "npm run build",
-  "outputDirectory": ".output/public",
+  "outputDirectory": "frontend/.output/public",
   "env": {
     "NUXT_PUBLIC_SITE_URL": "https://andyjaquecl.vercel.app"
   }
