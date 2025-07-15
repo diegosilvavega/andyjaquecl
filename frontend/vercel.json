@@ -1,5 +1,20 @@
 {
   "framework": "nuxtjs",
   "buildCommand": "npm run build",
-  "outputDirectory": ".output/public"
+  "outputDirectory": ".output/public",
+  "functions": {
+    "app/server/index.mjs": {
+      "maxDuration": 10
+    }
+  },
+  "routes": [
+    {
+      "src": "/.*",
+      "dest": "/",
+      "status": 200
+    }
+  ],
+  "env": {
+    "NUXT_PUBLIC_SITE_URL": "https://andyjaquecl.vercel.app"
+  }
 } 
