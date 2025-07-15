@@ -1,12 +1,9 @@
 <template>
-  <div class="min-h-screen bg-gray-900 text-white mt-20">
+  <div class="min-h-screen bg-gray-900 text-white mt-16">
     <!-- Hero Section -->
-    <section class="relative py-20 bg-gradient-to-b from-gray-800 to-gray-900">
+    <section class="relative py-8 bg-gradient-to-b from-gray-800 to-gray-900">
       <div class="container mx-auto px-4 text-center">
-        <h1 class="text-4xl md:text-6xl font-capture text-yellow-400 mb-6">
-          MERCH
-        </h1>
-        <p class="text-xl md:text-2xl text-gray-300 font-capture-2 mb-8">
+        <p class="text-xl md:text-2xl text-gray-300 font-capture-2 mb-1">
           Productos Oficiales Andy Jaque
         </p>
         <p class="text-gray-400 font-body max-w-2xl mx-auto">
@@ -16,7 +13,7 @@
     </section>
 
     <!-- Coming Soon Section -->
-    <section class="py-16">
+    <section class="py-8">
       <div class="container mx-auto px-4">
         <div class="max-w-4xl mx-auto text-center">
           <div class="bg-gray-800 rounded-xl p-12 border border-yellow-400/20">

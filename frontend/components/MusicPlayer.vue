@@ -1,5 +1,5 @@
 <template>
-  <div class="fixed bottom-20 right-6 z-40">
+  <div class="fixed bottom-10 right-4 z-40">
     <!-- Click to Listen Message (only when not playing and never played before) -->
     <div 
       v-if="!isPlaying && !hasPlayedBefore"
@@ -13,11 +13,11 @@
     <!-- Song Title Marquee (only when playing and not minimized) -->
     <div 
       v-if="isPlaying && !isMinimized"
-      class="bg-gray-900/90 backdrop-blur-sm rounded-full px-4 py-2 border border-yellow-400/30 shadow-2xl mb-2 overflow-hidden relative"
+      class="bg-gray-900/90 backdrop-blur-sm rounded-full px-3 py-1 border border-yellow-400/30 shadow-2xl mb-2 overflow-hidden relative"
     >
       <div class="marquee-container">
         <div class="marquee-text">
-          <span class="text-sm text-yellow-400 font-body whitespace-nowrap">
+          <span class="text-xs text-yellow-400 font-body whitespace-nowrap">
             Redsound (Parte 1) - Andy Jaque Y Su Banda
           </span>
         </div>
@@ -25,16 +25,16 @@
     </div>
 
     <!-- Music Player Button -->
-    <div class="bg-gray-900/90 backdrop-blur-sm rounded-full p-4 border border-yellow-400/30 shadow-2xl">
-      <div class="flex items-center gap-3">
+    <div class="bg-gray-900/90 backdrop-blur-sm rounded-full p-3 border border-yellow-400/30 shadow-2xl">
+      <div class="flex items-center gap-2">
         <!-- Play/Pause Button -->
         <button
           @click="togglePlay"
-          class="w-12 h-12 bg-yellow-400 hover:bg-yellow-500 rounded-full flex items-center justify-center transition-colors group"
+          class="w-10 h-10 bg-yellow-400 hover:bg-yellow-500 rounded-full flex items-center justify-center transition-colors group"
         >
           <svg
             v-if="!isPlaying"
-            class="w-6 h-6 text-black ml-0.5"
+            class="w-5 h-5 text-black ml-0.5"
             fill="currentColor"
             viewBox="0 0 24 24"
           >
@@ -42,7 +42,7 @@
           </svg>
           <svg
             v-else
-            class="w-6 h-6 text-black"
+            class="w-5 h-5 text-black"
             fill="currentColor"
             viewBox="0 0 24 24"
           >
@@ -53,15 +53,15 @@
         <!-- Volume Controls (shown when not minimized) -->
         <div 
           v-if="!isMinimized"
-          class="flex items-center gap-2 transition-all duration-300"
+          class="flex items-center gap-1 transition-all duration-300"
         >
           <button
             @click="toggleMute"
-            class="w-8 h-8 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center transition-colors"
+            class="w-6 h-6 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center transition-colors"
           >
             <svg
               v-if="!isMuted"
-              class="w-4 h-4 text-white"
+              class="w-3 h-3 text-white"
               fill="currentColor"
               viewBox="0 0 24 24"
             >
@@ -69,7 +69,7 @@
             </svg>
             <svg
               v-else
-              class="w-4 h-4 text-white"
+              class="w-3 h-3 text-white"
               fill="currentColor"
               viewBox="0 0 24 24"
             >
@@ -84,17 +84,17 @@
             min="0"
             max="1"
             step="0.1"
-            class="w-20 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
+            class="w-16 h-1 bg-gray-600 rounded-lg appearance-none cursor-pointer slider"
           >
         </div>
 
         <!-- Minimize/Maximize Button -->
         <button
           @click="isMinimized = !isMinimized"
-          class="w-8 h-8 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center transition-colors"
+          class="w-6 h-6 bg-gray-700 hover:bg-gray-600 rounded-full flex items-center justify-center transition-colors"
         >
           <svg
-            class="w-4 h-4 text-white transform transition-transform"
+            class="w-3 h-3 text-white transform transition-transform"
             :class="{ 'rotate-180': !isMinimized }"
             fill="none"
             stroke="currentColor"

@@ -1,18 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gray-900 text-white mt-20">
-    <!-- Hero Section -->
-    <section class="relative py-16 bg-gradient-to-b from-gray-800 to-gray-900">
-      <div class="container mx-auto px-4 text-center">
-        <h1 class="text-4xl md:text-6xl font-capture text-yellow-400 mb-6">
-          FOTOS
-        </h1>
-        <p class="text-xl md:text-2xl text-gray-300 font-capture-2 mb-8 max-w-4xl mx-auto">
-          Revive los mejores momentos de los shows, ensayos y momentos especiales de Andy Jaque y su banda.
-        </p>
-      </div>
-    </section>
-
-    <!-- Carousel Section -->
+  <div class="min-h-screen bg-gray-900 text-white mt-16">
+    <!-- Carousel Section - Ahora aparece inmediatamente -->
     <section class="py-8">
       <div class="container mx-auto px-4">
         <!-- Carousel Container -->
@@ -255,68 +243,127 @@ const modalImageLoaded = ref(false)
 const isLoadingMore = ref(false)
 const gallerySection = ref<HTMLElement | null>(null)
 
-// Colección de fotos organizadas por categorías
-const photoCollections: Record<string, Photo[]> = {
-  ANDY: [
-    { src: '/fotos/ANDY/DSC02151.jpg', description: 'Andy Jaque en acción', category: 'ANDY' },
-    { src: '/fotos/ANDY/DSC02080.jpg', description: 'Momento especial de Andy', category: 'ANDY' },
-    { src: '/fotos/ANDY/DSC01964.jpg', description: 'Andy y su teclado', category: 'ANDY' },
-    { src: '/fotos/ANDY/DSC01059.jpg', description: 'Concentración total', category: 'ANDY' },
-    { src: '/fotos/ANDY/DSC00989.jpg', description: 'Andy en el escenario', category: 'ANDY' },
-    { src: '/fotos/ANDY/DSC00971.jpg', description: 'La pasión por la música', category: 'ANDY' }
-  ],
-  BANDA: [
-    { src: '/fotos/BANDA/DSC03067.jpg', description: 'La banda en pleno show', category: 'BANDA' },
-    { src: '/fotos/BANDA/DSC02751.jpg', description: 'Energía pura en el escenario', category: 'BANDA' },
-    { src: '/fotos/BANDA/DSC02720.jpg', description: 'Conexión con el público', category: 'BANDA' },
-    { src: '/fotos/BANDA/DSC02656.jpg', description: 'Momentos únicos', category: 'BANDA' },
-    { src: '/fotos/BANDA/DSC02486.jpg', description: 'La banda completa', category: 'BANDA' },
-    { src: '/fotos/BANDA/DSC02352.jpg', description: 'Jaqueando la cumbia', category: 'BANDA' }
-  ],
-  TITO: [
-    { src: '/fotos/TITO/DSC03052.jpg', description: 'Tito en acción', category: 'TITO' },
-    { src: '/fotos/TITO/DSC03047.jpg', description: 'Momento especial de Tito', category: 'TITO' },
-    { src: '/fotos/TITO/DSC02070.jpg', description: 'Tito y su instrumento', category: 'TITO' },
-    { src: '/fotos/TITO/DSC02041.jpg', description: 'Concentración total', category: 'TITO' },
-    { src: '/fotos/TITO/DSC01884.jpg', description: 'Tito en el escenario', category: 'TITO' },
-    { src: '/fotos/TITO/DSC01120.jpg', description: 'La pasión musical', category: 'TITO' }
-  ],
-  COKE: [
-    { src: '/fotos/COKE/DSC03039.jpg', description: 'Coke en acción', category: 'COKE' },
-    { src: '/fotos/COKE/DSC02818.jpg', description: 'Momento especial de Coke', category: 'COKE' },
-    { src: '/fotos/COKE/DSC02198.jpg', description: 'Coke y su instrumento', category: 'COKE' },
-    { src: '/fotos/COKE/DSC01932.jpg', description: 'Concentración total', category: 'COKE' },
-    { src: '/fotos/COKE/DSC01886.jpg', description: 'Coke en el escenario', category: 'COKE' },
-    { src: '/fotos/COKE/DSC01542.jpg', description: 'La pasión musical', category: 'COKE' }
-  ],
-  MAURI: [
-    { src: '/fotos/MAURI/DSC03023.jpg', description: 'Mauri en acción', category: 'MAURI' },
-    { src: '/fotos/MAURI/DSC03016.jpg', description: 'Momento especial de Mauri', category: 'MAURI' },
-    { src: '/fotos/MAURI/DSC02017.jpg', description: 'Mauri y su instrumento', category: 'MAURI' },
-    { src: '/fotos/MAURI/DSC01954.jpg', description: 'Concentración total', category: 'MAURI' },
-    { src: '/fotos/MAURI/DSC01333.jpg', description: 'Mauri en el escenario', category: 'MAURI' },
-    { src: '/fotos/MAURI/DSC01254.jpg', description: 'La pasión musical', category: 'MAURI' }
-  ],
-  YALO: [
-    { src: '/fotos/YALO/DSC02158.jpg', description: 'Yalo en acción', category: 'YALO' },
-    { src: '/fotos/YALO/DSC02031.jpg', description: 'Momento especial de Yalo', category: 'YALO' }
-  ]
+// Función para generar descripción automática de fotos
+function generatePhotoDescription(filename: string, category: string): string {
+  const descriptions = {
+    ANDY: ['Andy Jaque en acción', 'Momento especial de Andy', 'Andy y su teclado', 'Concentración total', 'Andy en el escenario', 'La pasión por la música', 'Andy dirigiendo la banda', 'Energía pura'],
+    BANDA: ['La banda en pleno show', 'Energía pura en el escenario', 'Conexión con el público', 'Momentos únicos', 'La banda completa', 'Jaqueando la cumbia', 'Show en vivo', 'Momento especial'],
+    TITO: ['Tito en acción', 'Momento especial de Tito', 'Tito y su instrumento', 'Concentración total', 'Tito en el escenario', 'La pasión musical'],
+    COKE: ['Coke en acción', 'Momento especial de Coke', 'Coke y su instrumento', 'Concentración total', 'Coke en el escenario', 'La pasión musical'],
+    MAURI: ['Mauri en acción', 'Momento especial de Mauri', 'Mauri y su instrumento', 'Concentración total', 'Mauri en el escenario', 'La pasión musical'],
+    YALO: ['Yalo en acción', 'Momento especial de Yalo', 'Yalo y su instrumento', 'Concentración total', 'Yalo en el escenario', 'La pasión musical']
+  }
+  
+  const categoryDescriptions = descriptions[category as keyof typeof descriptions] || ['Momento musical', 'En el escenario']
+  const randomIndex = Math.floor(Math.random() * categoryDescriptions.length)
+  return categoryDescriptions[randomIndex]
 }
 
-// Fotos que están en formato horizontal (landscape)
+// Generar colección de fotos dinámicamente - TODAS las fotos disponibles
+const photoCollections: Record<string, Photo[]> = {
+  ANDY: [
+    // 24 fotos de Andy
+    'DSC00971.jpg', 'DSC00972.jpg', 'DSC00983.jpg', 'DSC00984.jpg', 'DSC00989.jpg', 'DSC01041.jpg',
+    'DSC01053.jpg', 'DSC01059.jpg', 'DSC01459.jpg', 'DSC01469.jpg', 'DSC01481.jpg', 'DSC01538.jpg',
+    'DSC01962.jpg', 'DSC01964.jpg', 'DSC02002.jpg', 'DSC02054.jpg', 'DSC02055.jpg', 'DSC02079.jpg',
+    'DSC02080.jpg', 'DSC02151.jpg', 'DSC02243.jpg', 'DSC02865.jpg', 'DSC02938.jpg', 'DSC02945.jpg'
+  ].map(filename => ({ 
+    src: `/fotos-optimized/ANDY/${filename}`, 
+    description: generatePhotoDescription(filename, 'ANDY'), 
+    category: 'ANDY' 
+  })),
+  
+  BANDA: [
+    // 29 fotos de la banda
+    'DSC00975.jpg', 'DSC01798.jpg', 'DSC01820.jpg', 'DSC02059.jpg', 'DSC02065.jpg', 'DSC02285.jpg',
+    'DSC02287.jpg', 'DSC02352.jpg', 'DSC02423.jpg', 'DSC02429.jpg', 'DSC02465.jpg', 'DSC02480.jpg',
+    'DSC02481.jpg', 'DSC02486.jpg', 'DSC02542.jpg', 'DSC02576.jpg', 'DSC02589.jpg', 'DSC02593.jpg',
+    'DSC02656.jpg', 'DSC02715.jpg', 'DSC02720.jpg', 'DSC02725.jpg', 'DSC02727.jpg', 'DSC02728.jpg',
+    'DSC02733.jpg', 'DSC02751.jpg', 'DSC02995.jpg', 'DSC03001.jpg', 'DSC03067.jpg'
+  ].map(filename => ({ 
+    src: `/fotos-optimized/BANDA/${filename}`, 
+    description: generatePhotoDescription(filename, 'BANDA'), 
+    category: 'BANDA' 
+  })),
+  
+  TITO: [
+    // 9 fotos de Tito
+    'DSC01120.jpg', 'DSC01868.jpg', 'DSC01884.jpg', 'DSC01995.jpg', 'DSC02041.jpg',
+    'DSC02063.jpg', 'DSC02070.jpg', 'DSC03047.jpg', 'DSC03052.jpg'
+  ].map(filename => ({ 
+    src: `/fotos-optimized/TITO/${filename}`, 
+    description: generatePhotoDescription(filename, 'TITO'), 
+    category: 'TITO' 
+  })),
+  
+  COKE: [
+    // 8 fotos de Coke
+    'DSC01542.jpg', 'DSC01885.jpg', 'DSC01886.jpg', 'DSC01932.jpg',
+    'DSC02116.jpg', 'DSC02198.jpg', 'DSC02818.jpg', 'DSC03039.jpg'
+  ].map(filename => ({ 
+    src: `/fotos-optimized/COKE/${filename}`, 
+    description: generatePhotoDescription(filename, 'COKE'), 
+    category: 'COKE' 
+  })),
+  
+  MAURI: [
+    // 6 fotos de Mauri
+    'DSC01254.jpg', 'DSC01333.jpg', 'DSC01954.jpg', 'DSC02017.jpg', 'DSC03016.jpg', 'DSC03023.jpg'
+  ].map(filename => ({ 
+    src: `/fotos-optimized/MAURI/${filename}`, 
+    description: generatePhotoDescription(filename, 'MAURI'), 
+    category: 'MAURI' 
+  })),
+  
+  YALO: [
+    // 2 fotos de Yalo
+    'DSC02031.jpg', 'DSC02158.jpg'
+  ].map(filename => ({ 
+    src: `/fotos-optimized/YALO/${filename}`, 
+    description: generatePhotoDescription(filename, 'YALO'), 
+    category: 'YALO' 
+  }))
+}
+
+// Lista específica de fotos HORIZONTALES para el carrusel (solo fotos horizontales confirmadas)
 const horizontalPhotos: Photo[] = [
-  { src: '/fotos/BANDA/DSC03067.jpg', description: 'La banda en pleno show', category: 'BANDA' },
-  { src: '/fotos/BANDA/DSC02751.jpg', description: 'Energía pura en el escenario', category: 'BANDA' },
-  { src: '/fotos/BANDA/DSC02720.jpg', description: 'Conexión con el público', category: 'BANDA' },
-  { src: '/fotos/BANDA/DSC02656.jpg', description: 'Momentos únicos', category: 'BANDA' },
-  { src: '/fotos/BANDA/DSC02486.jpg', description: 'La banda completa', category: 'BANDA' },
-  { src: '/fotos/BANDA/DSC02352.jpg', description: 'Jaqueando la cumbia', category: 'BANDA' },
-  { src: '/fotos/BANDA/DSC02589.jpg', description: 'Show en vivo', category: 'BANDA' },
-  { src: '/fotos/BANDA/DSC02576.jpg', description: 'Momento especial', category: 'BANDA' },
-  { src: '/fotos/BANDA/DSC02542.jpg', description: 'En el escenario', category: 'BANDA' },
-  { src: '/fotos/ANDY/DSC02151.jpg', description: 'Andy Jaque en acción', category: 'ANDY' },
-  { src: '/fotos/ANDY/DSC01964.jpg', description: 'Andy y su teclado', category: 'ANDY' },
-  { src: '/fotos/ANDY/DSC01059.jpg', description: 'Concentración total', category: 'ANDY' }
+  // BANDA - Fotos horizontales seleccionadas
+  { src: '/fotos-optimized/BANDA/DSC02751.jpg', description: 'Energía pura en el escenario', category: 'BANDA' },
+  { src: '/fotos-optimized/BANDA/DSC02720.jpg', description: 'Conexión con el público', category: 'BANDA' },
+  { src: '/fotos-optimized/BANDA/DSC02656.jpg', description: 'Momentos únicos', category: 'BANDA' },
+  { src: '/fotos-optimized/BANDA/DSC02486.jpg', description: 'La banda completa', category: 'BANDA' },
+  { src: '/fotos-optimized/BANDA/DSC02589.jpg', description: 'Show en vivo', category: 'BANDA' },
+  { src: '/fotos-optimized/BANDA/DSC02576.jpg', description: 'Momento especial', category: 'BANDA' },
+  { src: '/fotos-optimized/BANDA/DSC02542.jpg', description: 'En el escenario', category: 'BANDA' },
+  { src: '/fotos-optimized/BANDA/DSC02733.jpg', description: 'Jaqueando la cumbia', category: 'BANDA' },
+  { src: '/fotos-optimized/BANDA/DSC02995.jpg', description: 'Energía total', category: 'BANDA' },
+  { src: '/fotos-optimized/BANDA/DSC03001.jpg', description: 'La banda en acción', category: 'BANDA' },
+  
+  // ANDY - Fotos horizontales seleccionadas  
+  { src: '/fotos-optimized/ANDY/DSC02151.jpg', description: 'Andy Jaque en acción', category: 'ANDY' },
+  { src: '/fotos-optimized/ANDY/DSC02080.jpg', description: 'Momento especial de Andy', category: 'ANDY' },
+  { src: '/fotos-optimized/ANDY/DSC00989.jpg', description: 'Andy en el escenario', category: 'ANDY' },
+  { src: '/fotos-optimized/ANDY/DSC00971.jpg', description: 'La pasión por la música', category: 'ANDY' },
+  { src: '/fotos-optimized/ANDY/DSC02055.jpg', description: 'Andy dirigiendo', category: 'ANDY' },
+  { src: '/fotos-optimized/ANDY/DSC02243.jpg', description: 'Concentración total', category: 'ANDY' },
+  
+  // TITO - Solo fotos horizontales confirmadas (6000x4000) - REMOVIDAS las verticales DSC01884 y DSC01995
+  { src: '/fotos-optimized/TITO/DSC01120.jpg', description: 'Tito en concentración', category: 'TITO' },
+  { src: '/fotos-optimized/TITO/DSC01868.jpg', description: 'Tito y su instrumento', category: 'TITO' },
+  { src: '/fotos-optimized/TITO/DSC02041.jpg', description: 'Tito en el escenario', category: 'TITO' },
+  { src: '/fotos-optimized/TITO/DSC02063.jpg', description: 'Tito en acción', category: 'TITO' },
+  { src: '/fotos-optimized/TITO/DSC02070.jpg', description: 'Tito con pasión', category: 'TITO' },
+  { src: '/fotos-optimized/TITO/DSC03047.jpg', description: 'Tito en el show', category: 'TITO' },
+  { src: '/fotos-optimized/TITO/DSC03052.jpg', description: 'Tito en vivo', category: 'TITO' },
+  
+  // COKE - Fotos horizontales
+  { src: '/fotos-optimized/COKE/DSC02198.jpg', description: 'Coke y su instrumento', category: 'COKE' },
+  { src: '/fotos-optimized/COKE/DSC01932.jpg', description: 'Coke en concentración', category: 'COKE' },
+  { src: '/fotos-optimized/COKE/DSC01886.jpg', description: 'Coke en el escenario', category: 'COKE' },
+  
+  // MAURI - Fotos horizontales  
+  { src: '/fotos-optimized/MAURI/DSC02017.jpg', description: 'Mauri y su instrumento', category: 'MAURI' },
+  { src: '/fotos-optimized/MAURI/DSC01333.jpg', description: 'Mauri en el escenario', category: 'MAURI' },
 ]
 
 // Función para mezclar array aleatoriamente
@@ -360,13 +407,13 @@ function toggleGallery() {
   }
 }
 
-// Función para cargar galería completa
+// Función para cargar galería completa (aleatorio)
 function loadGallery() {
   isLoadingMore.value = true
   
   setTimeout(() => {
     const allPhotos = Object.values(photoCollections).flat()
-    shuffledPhotos.value = shuffleArray(allPhotos)
+    shuffledPhotos.value = shuffleArray(allPhotos) // Volvemos a usar orden aleatorio
     isLoadingMore.value = false
   }, 500)
 }
@@ -405,9 +452,9 @@ function closeModal() {
 
 // Inicializar la galería con fotos destacadas
 onMounted(() => {
-  // Usar solo fotos horizontales para el carrusel
-  const shuffled = shuffleArray(horizontalPhotos)
-  featuredPhotos.value = shuffled.slice(0, 6) // Seleccionar 6 fotos horizontales aleatorias para el carrusel
+  // CARRUSEL: Solo fotos horizontales (aleatorias)
+  const shuffledHorizontal = shuffleArray(horizontalPhotos)
+  featuredPhotos.value = shuffledHorizontal.slice(0, 8) // 8 fotos horizontales aleatorias para el carrusel
   
   // Auto-advance carousel
   setInterval(() => {

@@ -1,11 +1,8 @@
 <template>
-  <div class="min-h-screen bg-gray-900 text-white">
+  <div class="min-h-screen bg-gray-900 text-white mt-16">
     <!-- Hero Section -->
-    <section class="py-24 bg-gradient-to-b from-gray-800 to-gray-900">
+    <section class="py-20 bg-gradient-to-b from-gray-800 to-gray-900">
       <div class="container mx-auto px-4 text-center">
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-capture text-yellow-400 mb-6 text-shadow-lg glow-effect">
-          DOMINA LA MÚSICA
-        </h1>
         <p class="text-xl md:text-2xl lg:text-3xl text-white max-w-4xl mx-auto mb-4 font-capture-2">
           Aprende Teclado y Producción Musical con un Profesional
         </p>
@@ -59,7 +56,11 @@
            <div class="bg-black bg-opacity-40 rounded-xl p-8 backdrop-blur-sm border border-yellow-400 border-opacity-20 hover:border-opacity-40 transition-all duration-300">
              <div class="text-center mb-6">
                <h3 class="text-2xl font-capture text-yellow-400 mb-2">BÁSICO</h3>
-               <p class="text-gray-300 text-sm mb-4">Perfecto para principiantes</p>
+               <p class="text-gray-300 text-sm mb-4">Perfect para empezar</p>
+               <div class="flex items-center justify-center gap-2 mb-2">
+                 <span class="text-2xl text-gray-500 line-through">$45.000</span>
+                 <span class="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">-33%</span>
+               </div>
                <div class="text-4xl font-capture text-white mb-2">$30.000</div>
                <div class="text-gray-400 text-sm">CLP / clase individual</div>
              </div>
@@ -98,9 +99,13 @@
              <div class="text-center mb-6">
                <h3 class="text-2xl font-capture text-yellow-400 mb-2">INTERMEDIO</h3>
                <p class="text-gray-300 text-sm mb-4">Ideal para progreso rápido</p>
+               <div class="flex items-center justify-center gap-2 mb-2">
+                 <span class="text-2xl text-gray-500 line-through">$140.000</span>
+                 <span class="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">-29%</span>
+               </div>
                <div class="text-4xl font-capture text-white mb-2">$100.000</div>
                <div class="text-gray-400 text-sm">CLP / 4 clases mensuales</div>
-               <div class="text-green-400 text-xs mt-1">Ahorra $20.000</div>
+               <div class="text-green-400 text-xs mt-1">Ahorra $40.000</div>
              </div>
              <ul class="space-y-3 text-sm text-gray-300 mb-8">
                <li class="flex items-center">

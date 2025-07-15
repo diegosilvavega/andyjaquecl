@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-900 text-white mt-20">
+  <div class="min-h-screen bg-gray-900 text-white mt-16">
     <!-- Hero Section -->
     <section class="relative py-20 bg-gradient-to-b from-gray-800 to-gray-900">
       <div class="container mx-auto px-4 text-center">

@@ -1,21 +1,6 @@
 <template>
-  <div class="min-h-screen bg-gray-900 text-white mt-20">
-    <!-- Hero Section -->
-    <section class="relative py-20 bg-gradient-to-b from-gray-800 to-gray-900">
-      <div class="container mx-auto px-4 text-center">
-        <h1 class="text-4xl md:text-6xl font-capture text-yellow-400 mb-6">
-          BIO
-        </h1>
-        <p class="text-xl md:text-2xl text-gray-300 font-capture-2 mb-8">
-          La Historia de Andy Jaque
-        </p>
-        <p class="text-gray-400 font-body max-w-2xl mx-auto">
-          Conoce la trayectoria del tecladista que está jaqueando la cumbia en Chile.
-        </p>
-      </div>
-    </section>
-
-    <!-- Biography Content -->
+  <div class="min-h-screen bg-gray-900 text-white mt-16">
+    <!-- Biography Content - Ahora aparece inmediatamente -->
     <section class="py-16">
       <div class="container mx-auto px-4">
         <div class="max-w-4xl mx-auto">

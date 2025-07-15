@@ -1,24 +1,55 @@
 <template>
-  <div class="min-h-screen bg-gray-900 text-white mt-20">
-    <!-- Hero Section -->
-    <section class="relative py-20 bg-gradient-to-b from-gray-800 to-gray-900">
-      <div class="container mx-auto px-4 text-center">
-        <h1 class="text-4xl md:text-6xl font-capture text-yellow-400 mb-6">
-          NEWS
-        </h1>
-        <p class="text-xl md:text-2xl text-gray-300 font-capture-2 mb-8">
-          Últimas Noticias y Novedades
-        </p>
-        <p class="text-gray-400 font-body max-w-2xl mx-auto">
-          Mantente al día con las últimas novedades del Tour Jaqueando la Cumbia 2025.
-        </p>
-      </div>
-    </section>
-
-    <!-- Latest News -->
+  <div class="min-h-screen bg-gray-900 text-white mt-16">
+    <!-- Latest News - Ahora aparece inmediatamente -->
     <section class="py-16">
       <div class="container mx-auto px-4">
         <div class="max-w-4xl mx-auto space-y-8">
+          <!-- NUEVA NOTICIA PRINCIPAL - Andy Jaque y Super Banda Tropikal -->
+          <article class="bg-gray-800 rounded-xl p-8 border border-yellow-400/30 shadow-2xl">
+            <div class="flex items-center gap-2 mb-4">
+              <span class="bg-red-600 text-white px-3 py-1 rounded-full text-sm font-capture animate-pulse">
+                ¡NUEVO!
+              </span>
+              <span class="text-gray-400 text-sm">
+                Junio 2025
+              </span>
+            </div>
+            <h2 class="text-2xl md:text-3xl font-capture text-yellow-400 mb-4">
+              Andy Jaque y la Super Banda Tropikal graban colaboración en Vallenar
+            </h2>
+            <p class="text-gray-300 font-body leading-relaxed mb-4">
+              El tecladista de la cumbia Andy Jaque se unió con la legendaria Super Banda Tropikal para grabar una colaboración especial en la plaza de Vallenar. La Super Banda Tropikal, con 26 años de trayectoria, está nominada a los Premios Pulsar mientras que Andy Jaque celebra su primer año como banda.
+            </p>
+            <p class="text-gray-300 font-body leading-relaxed mb-6">
+              El video se lanzará próximamente en Spotify y YouTube. La banda pide a sus seguidores votar por Banda Tropikal en la categoría "Mejor Artista Tropical" de los Premios Pulsar.
+            </p>
+            <div class="flex flex-wrap gap-2 mb-4">
+              <span class="bg-yellow-400/20 text-yellow-400 px-3 py-1 rounded-lg text-sm font-capture">
+                #Colaboración
+              </span>
+              <span class="bg-yellow-400/20 text-yellow-400 px-3 py-1 rounded-lg text-sm font-capture">
+                #SuperBandaTropikal
+              </span>
+              <span class="bg-yellow-400/20 text-yellow-400 px-3 py-1 rounded-lg text-sm font-capture">
+                #Vallenar
+              </span>
+              <span class="bg-yellow-400/20 text-yellow-400 px-3 py-1 rounded-lg text-sm font-capture">
+                #PremiosPulsar
+              </span>
+            </div>
+            <a 
+              href="https://www.elzorronortino.cl/eventos-y-entretencion/andy-jaque-y-la-super-banda-tropikal-graban-colaboracion-en-vallenar/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 text-yellow-400 hover:text-yellow-300 transition-colors font-capture text-sm"
+            >
+              <span>Leer noticia completa</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+              </svg>
+            </a>
+          </article>
+
           <!-- Main News Item -->
           <article class="bg-gray-800 rounded-xl p-8 border border-yellow-400/20">
             <div class="flex items-center gap-2 mb-4">

@@ -11,6 +11,39 @@ export default defineNuxtConfig({
     '@unocss/nuxt'
   ],
 
+  image: {
+    quality: 80,
+    format: ['webp', 'avif', 'jpeg'],
+    screens: {
+      xs: 320,
+      sm: 640,
+      md: 768,
+      lg: 1024,
+      xl: 1280,
+      xxl: 1536,
+    },
+    densities: [1, 2],
+    domains: ['andyjaquecl.vercel.app'],
+    presets: {
+      hero: {
+        modifiers: {
+          format: 'webp',
+          quality: 85,
+          width: 1920,
+          height: 1080
+        }
+      },
+      thumbnail: {
+        modifiers: {
+          format: 'webp',
+          quality: 80,
+          width: 400,
+          height: 300
+        }
+      }
+    }
+  },
+
   runtimeConfig: {
     public: {
       firebase: {
@@ -27,6 +60,14 @@ export default defineNuxtConfig({
   },
 
   css: ['~/assets/css/main.css'],
+
+  app: {
+    head: {
+      link: [
+        { rel: 'icon', type: 'image/png', href: '/images/fonts/6.png' }
+      ]
+    }
+  },
 
   devServer: {
     host: '0.0.0.0',

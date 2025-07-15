@@ -30,18 +30,18 @@
       <!-- Content Overlay -->
       <div class="relative z-10 flex items-center justify-center h-full">
         <div class="text-center text-white px-4">
-          <h2 class="text-4xl md:text-6xl lg:text-7xl font-capture text-yellow-400 mb-4 text-shadow-lg glow-effect">
+          <h2 class="text-3xl md:text-4xl lg:text-5xl font-capture text-yellow-400 mb-3 text-shadow-lg glow-effect">
             EN VIVO
           </h2>
-          <p class="text-xl md:text-2xl lg:text-3xl font-capture-2 mb-6 text-shadow-lg">
+          <p class="text-lg md:text-xl lg:text-2xl font-capture-2 mb-4 text-shadow-lg">
             JAQUEANDO LA CUMBIA
           </p>
-          <p class="text-lg md:text-xl text-gray-300 max-w-2xl mx-auto mb-8 text-shadow-lg">
+          <p class="text-base md:text-lg text-gray-300 max-w-xl mx-auto mb-6 text-shadow-lg">
             Vive la experiencia única de la cumbia en directo
           </p>
           
           <!-- CTA Button -->
-          <button class="bg-yellow-400 hover:bg-yellow-500 text-black px-8 py-4 rounded-lg font-capture text-lg font-bold transition-all duration-300 transform hover:scale-105 shadow-xl">
+          <button class="bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-3 rounded-lg font-capture text-base font-bold transition-all duration-300 transform hover:scale-105 shadow-xl">
             🎫 AGENDA TU EVENTO
           </button>
         </div>

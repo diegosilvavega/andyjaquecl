@@ -1,11 +1,8 @@
 <template>
-  <div class="min-h-screen bg-gray-900 text-white">
+  <div class="min-h-screen bg-gray-900 text-white mt-16">
     <!-- Hero Section -->
-    <section class="py-24 bg-gradient-to-b from-gray-800 to-gray-900">
+    <section class="py-20 bg-gradient-to-b from-gray-800 to-gray-900">
       <div class="container mx-auto px-4 text-center">
-        <h1 class="text-4xl md:text-5xl lg:text-6xl font-capture text-yellow-400 mb-6 text-shadow-lg glow-effect">
-          PRODUCCIÓN MUSICAL PROFESIONAL
-        </h1>
         <p class="text-xl md:text-2xl lg:text-3xl text-white max-w-4xl mx-auto mb-4 font-capture-2">
           Convierte tu idea musical en una obra maestra
         </p>
@@ -60,6 +57,10 @@
              <div class="text-center mb-6">
                <h3 class="text-2xl font-capture text-yellow-400 mb-2">PRODUCCIÓN BÁSICA</h3>
                <p class="text-gray-300 text-sm mb-4">Ideal para demos y maquetas</p>
+               <div class="flex items-center justify-center gap-2 mb-2">
+                 <span class="text-2xl text-gray-500 line-through">$220.000</span>
+                 <span class="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">-32%</span>
+               </div>
                <div class="text-4xl font-capture text-white mb-2">$150.000</div>
                <div class="text-gray-400 text-sm">CLP / por canción</div>
              </div>
@@ -98,6 +99,10 @@
              <div class="text-center mb-6">
                <h3 class="text-2xl font-capture text-yellow-400 mb-2">PRODUCCIÓN PROFESIONAL</h3>
                <p class="text-gray-300 text-sm mb-4">Calidad de radio y streaming</p>
+               <div class="flex items-center justify-center gap-2 mb-2">
+                 <span class="text-2xl text-gray-500 line-through">$450.000</span>
+                 <span class="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">-33%</span>
+               </div>
                <div class="text-4xl font-capture text-white mb-2">$300.000</div>
                <div class="text-gray-400 text-sm">CLP / por canción</div>
              </div>
