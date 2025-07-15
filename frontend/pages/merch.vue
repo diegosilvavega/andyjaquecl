@@ -86,7 +86,7 @@
         <div class="max-w-4xl mx-auto">
           <div class="bg-gradient-to-r from-yellow-400/20 to-yellow-600/20 border border-yellow-400/30 rounded-xl p-8 text-center">
             <h3 class="text-2xl md:text-3xl font-capture text-yellow-400 mb-4">
-              🎪 EXCLUSIVO EN CONCIERTOS
+                              🎤 EXCLUSIVO EN CONCIERTOS
             </h3>
             <p class="text-gray-300 font-body leading-relaxed mb-6">
               Algunos productos estarán disponibles exclusivamente en los shows del Tour Jaqueando la Cumbia 2025. 

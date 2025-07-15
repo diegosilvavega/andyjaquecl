@@ -1,7 +1,13 @@
 // https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
-  devtools: { enabled: true },
+  devtools: { enabled: false }, // Deshabilitado para mejorar rendimiento
+  
+  // Optimizaciones de rendimiento
+  experimental: {
+    payloadExtraction: false,
+    renderJsonPayloads: true
+  },
 
   modules: [
     '@nuxt/eslint',
@@ -10,6 +16,27 @@ export default defineNuxtConfig({
     '@nuxt/ui',
     '@unocss/nuxt'
   ],
+
+  // Configuración del servidor de desarrollo
+  devServer: {
+    host: '0.0.0.0',
+    port: 3001
+  },
+
+  // Optimizaciones de Vite
+  vite: {
+    build: {
+      chunkSizeWarningLimit: 1000
+    },
+    server: {
+      hmr: {
+        overlay: false
+      }
+    },
+    optimizeDeps: {
+      include: ['vue', 'vue-router']
+    }
+  },
 
   image: {
     quality: 80,
@@ -69,16 +96,5 @@ export default defineNuxtConfig({
     }
   },
 
-  devServer: {
-    host: '0.0.0.0',
-    port: 3001
-  },
 
-  vite: {
-    server: {
-      hmr: {
-        protocol: 'wss'
-      }
-    }
-  }
 })

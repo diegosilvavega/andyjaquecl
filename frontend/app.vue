@@ -1,17 +1,20 @@
 <template>
   <div>
-    <!-- Navigation -->
-    <Navigation />
+    <!-- Navigation (only for public pages) -->
+    <Navigation v-if="!isAdminRoute" />
     
     <!-- Page Content -->
     <NuxtPage />
     
-    <!-- Music Player -->
-    <MusicPlayer />
+    <!-- Music Player (only for public pages) -->
+    <MusicPlayer v-if="!isAdminRoute" />
   </div>
 </template>
 
 <script setup>
+// Detectar si estamos en una ruta de admin
+const route = useRoute()
+const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 useHead({
   title: 'Andy Jaque - Tour Jaqueando la Cumbia 2025',
   meta: [

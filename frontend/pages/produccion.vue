@@ -41,7 +41,7 @@
       </div>
     </section>
 
-         <!-- Pricing Packages -->
+         <!-- Pricing Packages - Datos Dinámicos -->
      <section class="py-16 bg-gray-800">
        <div class="container mx-auto px-4">
          <h2 class="text-3xl md:text-4xl font-capture text-yellow-400 text-center mb-4 text-shadow-lg glow-effect">
@@ -50,8 +50,74 @@
          <p class="text-center text-gray-300 mb-12 max-w-2xl mx-auto">
            Elige el paquete que mejor se adapte a tu proyecto musical
          </p>
+
+         <!-- Loading State -->
+         <div v-if="loading" class="text-center py-12">
+           <div class="text-yellow-400 text-4xl mb-4">🎵</div>
+           <p class="text-gray-300">Cargando servicios de producción...</p>
+         </div>
          
-         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+         <!-- Dynamic Production Services -->
+         <div v-else-if="activeServices.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+           <div 
+             v-for="(service, index) in activeServices" 
+             :key="service.id"
+             :class="[
+               'bg-black bg-opacity-40 rounded-xl p-8 backdrop-blur-sm border hover:border-opacity-40 transition-all duration-300',
+               index === 1
+                 ? 'border-2 border-yellow-400 transform scale-105 relative' 
+                 : 'border border-yellow-400 border-opacity-20'
+             ]"
+           >
+             <!-- Popular Badge -->
+             <div v-if="index === 1" class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-black px-4 py-1 rounded-full text-sm font-capture font-bold">
+               MÁS SOLICITADO
+             </div>
+             
+             <div class="text-center mb-6">
+               <h3 class="text-2xl font-capture text-yellow-400 mb-2">{{ service.name.toUpperCase() }}</h3>
+               <p class="text-gray-300 text-sm mb-4">{{ service.description }}</p>
+               
+               <!-- Pricing -->
+               <div v-if="service.discountPercentage > 0" class="flex items-center justify-center gap-2 mb-2">
+                 <span class="text-2xl text-gray-500 line-through">${{ formatPrice(service.originalPrice) }}</span>
+                 <span class="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">-{{ service.discountPercentage }}%</span>
+               </div>
+               <div class="text-4xl font-capture text-white mb-2">${{ formatPrice(service.currentPrice) }}</div>
+               <div class="text-gray-400 text-sm">CLP{{ service.deliveryTime ? ` / ${service.deliveryTime}` : '' }}</div>
+             </div>
+             
+             <!-- Features List -->
+             <ul class="space-y-3 text-sm text-gray-300 mb-8">
+               <li v-for="feature in service.includes" :key="feature" class="flex items-center">
+                 <span class="text-yellow-400 mr-2">✓</span>
+                 {{ feature }}
+               </li>
+             </ul>
+             
+             <!-- CTA Button -->
+             <button 
+               :class="[
+                 'w-full px-6 py-3 rounded-lg font-capture font-bold transition-all duration-300',
+                 index === 1
+                   ? 'bg-yellow-400 text-black hover:bg-yellow-500'
+                   : 'bg-transparent border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black'
+               ]"
+             >
+               SOLICITAR COTIZACIÓN
+             </button>
+           </div>
+         </div>
+
+         <!-- Empty State -->
+         <div v-else-if="!loading" class="text-center py-12">
+           <div class="text-6xl mb-4">🎵</div>
+           <p class="text-gray-400 text-lg">No hay servicios de producción disponibles</p>
+           <p class="text-gray-500 text-sm mt-2">Los servicios se gestionan desde el panel de administración</p>
+         </div>
+
+         <!-- Fallback - Original hardcoded content if no dynamic data -->
+         <div v-if="!loading && activeServices.length === 0" class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mt-8">
            <!-- Paquete Básico -->
            <div class="bg-black bg-opacity-40 rounded-xl p-8 backdrop-blur-sm border border-yellow-400 border-opacity-20 hover:border-opacity-40 transition-all duration-300">
              <div class="text-center mb-6">
@@ -76,103 +142,6 @@
                <li class="flex items-center">
                  <span class="text-yellow-400 mr-2">✓</span>
                  Mezcla básica
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Master básico
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Entrega en 7 días
-               </li>
-             </ul>
-             <button class="w-full bg-transparent border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black px-6 py-3 rounded-lg font-capture font-bold transition-all duration-300">
-               SOLICITAR COTIZACIÓN
-             </button>
-           </div>
-
-           <!-- Paquete Profesional -->
-           <div class="bg-black bg-opacity-40 rounded-xl p-8 backdrop-blur-sm border-2 border-yellow-400 hover:border-opacity-60 transition-all duration-300 transform scale-105 relative">
-             <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-black px-4 py-1 rounded-full text-sm font-capture font-bold">
-               MÁS SOLICITADO
-             </div>
-             <div class="text-center mb-6">
-               <h3 class="text-2xl font-capture text-yellow-400 mb-2">PRODUCCIÓN PROFESIONAL</h3>
-               <p class="text-gray-300 text-sm mb-4">Calidad de radio y streaming</p>
-               <div class="flex items-center justify-center gap-2 mb-2">
-                 <span class="text-2xl text-gray-500 line-through">$450.000</span>
-                 <span class="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">-33%</span>
-               </div>
-               <div class="text-4xl font-capture text-white mb-2">$300.000</div>
-               <div class="text-gray-400 text-sm">CLP / por canción</div>
-             </div>
-             <ul class="space-y-3 text-sm text-gray-300 mb-8">
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Grabación profesional (pistas ilimitadas)
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Arreglos complejos
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Mezcla profesional
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Master profesional
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Músicos sesionistas incluidos
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Revisiones ilimitadas
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Entrega en 10 días
-               </li>
-             </ul>
-             <button class="w-full bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-3 rounded-lg font-capture font-bold transition-all duration-300 transform hover:scale-105">
-               COMENZAR PROYECTO
-             </button>
-           </div>
-
-           <!-- Paquete Premium -->
-           <div class="bg-black bg-opacity-40 rounded-xl p-8 backdrop-blur-sm border border-yellow-400 border-opacity-20 hover:border-opacity-40 transition-all duration-300">
-             <div class="text-center mb-6">
-               <h3 class="text-2xl font-capture text-yellow-400 mb-2">PAQUETE PREMIUM</h3>
-               <p class="text-gray-300 text-sm mb-4">Producción + Videoclip</p>
-               <div class="text-4xl font-capture text-white mb-2">$800.000</div>
-               <div class="text-gray-400 text-sm">CLP / canción + videoclip</div>
-             </div>
-             <ul class="space-y-3 text-sm text-gray-300 mb-8">
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Todo lo del paquete profesional
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Videoclip profesional
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Concepto creativo
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Dirección y producción
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Edición y post-producción
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Entrega en 15 días
                </li>
              </ul>
              <button class="w-full bg-transparent border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black px-6 py-3 rounded-lg font-capture font-bold transition-all duration-300">
@@ -581,6 +550,24 @@
 </template>
 
 <script setup lang="ts">
+// 🎯 DATOS DINÁMICOS DESDE EL PANEL DE ADMIN
+const { loadPrices, productionServices, loading } = useAdminPrices()
+
+// Cargar precios al montar la página
+onMounted(async () => {
+  await loadPrices()
+})
+
+// Servicios activos desde el panel de administración
+const activeServices = computed(() => 
+  productionServices.value.filter((service: any) => service.isActive)
+)
+
+// Función para formatear precios
+const formatPrice = (price: number) => {
+  return new Intl.NumberFormat('es-CL').format(price)
+}
+
 useHead({
   title: 'Producción Musical Profesional - Andy Jaque',
   meta: [

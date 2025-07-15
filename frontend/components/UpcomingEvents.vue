@@ -117,100 +117,17 @@
 </template>
 
 <script setup lang="ts">
-// Datos reales de los eventos de Andy Jaque
-const allEvents = [
-  {
-    id: 1,
-    date: new Date('2025-07-12'),
-    time: '22:00',
-    venue: 'Pub Delorean',
-    city: 'Vicuña',
-    price: null,
-    ticketUrl: null,
-    isSpecial: false
-  },
-  {
-    id: 2,
-    date: new Date('2025-07-19'),
-    time: '21:30',
-    venue: 'Ovalle Casino Resort',
-    city: 'Ovalle',
-    price: null,
-    ticketUrl: null,
-    isSpecial: false
-  },
-  {
-    id: 3,
-    date: new Date('2025-08-02'),
-    time: '20:00',
-    venue: 'OVO Beach Coquimbo',
-    city: 'Coquimbo',
-    price: null,
-    ticketUrl: null,
-    isSpecial: true,
-    specialText: 'Aniversario Andy Jaque y su Banda'
-  },
-  {
-    id: 4,
-    date: new Date('2025-08-09'),
-    time: '21:00',
-    venue: 'Enjoy Antofagasta',
-    city: 'Antofagasta',
-    price: null,
-    ticketUrl: null,
-    isSpecial: false
-  },
-  {
-    id: 5,
-    date: new Date('2025-08-15'),
-    time: '21:30',
-    venue: 'Fraternidad La Diablada',
-    city: 'Calama',
-    price: null,
-    ticketUrl: null,
-    isSpecial: false
-  },
-  {
-    id: 6,
-    date: new Date('2025-08-29'),
-    time: '22:00',
-    venue: 'Salón Refugio Tropical',
-    city: 'Copiapó',
-    price: null,
-    ticketUrl: null,
-    isSpecial: false
-  },
-  {
-    id: 7,
-    date: new Date('2025-08-30'),
-    time: '20:00',
-    venue: 'Evento Privado',
-    city: 'Copiapó',
-    price: null,
-    ticketUrl: null,
-    isSpecial: false,
-    isPrivate: true
-  },
-  {
-    id: 8,
-    date: new Date('2025-09-01'),
-    time: '21:00',
-    venue: 'Evento Privado',
-    city: 'La Serena',
-    price: null,
-    ticketUrl: null,
-    isSpecial: false,
-    isPrivate: true
-  }
-]
+// 🎯 DATOS DINÁMICOS DESDE EL PANEL DE ADMIN
+// Ahora los eventos se gestionan desde /admin/events
+const { loadEvents, getUpcomingEvents } = useAdminEvents()
 
-// Filtrar eventos futuros y ordenar por fecha
-const events = computed(() => {
-  const now = new Date()
-  return allEvents
-    .filter(event => event.date >= now)
-    .sort((a, b) => a.date.getTime() - b.date.getTime())
+// Cargar eventos al montar el componente
+onMounted(async () => {
+  await loadEvents()
 })
+
+// Eventos dinámicos desde el panel de administración
+const events = computed(() => getUpcomingEvents.value)
 
 const formatMonth = (date: Date) => {
   return date.toLocaleDateString('es-ES', { month: 'short' }).toUpperCase()
@@ -223,10 +140,6 @@ const formatDay = (date: Date) => {
 const formatTime = (time: string) => {
   return `${time} hrs`
 }
-
-// TODO: Conectar con Firestore para datos dinámicos
-// const { getUpcomingEvents } = useFirestore()
-// const { data: events } = await getUpcomingEvents()
 </script>
 
 <style scoped>

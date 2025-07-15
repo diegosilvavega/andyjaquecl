@@ -78,4 +78,16 @@ useHead({
     { name: 'twitter:image', content: 'https://andyjaque.cl/og-image.jpg' }
   ]
 })
+
+// 🎯 CARGAR DATOS DINÁMICOS DEL PANEL DE ADMIN
+const { loadEvents } = useAdminEvents()
+const { loadMedia } = useAdminMedia()
+
+// Cargar todos los datos necesarios para la página principal
+onMounted(async () => {
+  await Promise.all([
+    loadEvents(),
+    loadMedia()
+  ])
+})
 </script> 

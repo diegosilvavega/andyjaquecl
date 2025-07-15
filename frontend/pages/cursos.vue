@@ -41,7 +41,7 @@
       </div>
     </section>
 
-         <!-- Pricing Section -->
+         <!-- Pricing Section - Datos Dinámicos -->
      <section class="py-16 bg-gray-800">
        <div class="container mx-auto px-4">
          <h2 class="text-3xl md:text-4xl font-capture text-yellow-400 text-center mb-4 text-shadow-lg glow-effect">
@@ -50,8 +50,74 @@
          <p class="text-center text-gray-300 mb-12 max-w-2xl mx-auto">
            Elige el paquete que mejor se adapte a tus necesidades y objetivos musicales
          </p>
+
+         <!-- Loading State -->
+         <div v-if="loading" class="text-center py-12">
+           <div class="text-yellow-400 text-4xl mb-4">🎹</div>
+           <p class="text-gray-300">Cargando paquetes de cursos...</p>
+         </div>
          
-         <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+         <!-- Dynamic Pricing Cards -->
+         <div v-else-if="activeCourses.length > 0" class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+           <div 
+             v-for="(course, index) in activeCourses" 
+             :key="course.id"
+             :class="[
+               'bg-black bg-opacity-40 rounded-xl p-8 backdrop-blur-sm border hover:border-opacity-40 transition-all duration-300',
+               course.isPopular 
+                 ? 'border-2 border-yellow-400 transform scale-105 relative' 
+                 : 'border border-yellow-400 border-opacity-20'
+             ]"
+           >
+             <!-- Popular Badge -->
+             <div v-if="course.isPopular" class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-black px-4 py-1 rounded-full text-sm font-capture font-bold">
+               MÁS POPULAR
+             </div>
+             
+             <div class="text-center mb-6">
+               <h3 class="text-2xl font-capture text-yellow-400 mb-2">{{ course.name.toUpperCase() }}</h3>
+               <p class="text-gray-300 text-sm mb-4">{{ course.description }}</p>
+               
+               <!-- Pricing -->
+               <div v-if="course.discountPercentage > 0" class="flex items-center justify-center gap-2 mb-2">
+                 <span class="text-2xl text-gray-500 line-through">${{ formatPrice(course.originalPrice) }}</span>
+                 <span class="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">-{{ course.discountPercentage }}%</span>
+               </div>
+               <div class="text-4xl font-capture text-white mb-2">${{ formatPrice(course.currentPrice) }}</div>
+               <div class="text-gray-400 text-sm">CLP{{ course.duration ? ` / ${course.duration}` : '' }}</div>
+             </div>
+             
+             <!-- Features List -->
+             <ul class="space-y-3 text-sm text-gray-300 mb-8">
+               <li v-for="feature in course.features" :key="feature" class="flex items-center">
+                 <span class="text-yellow-400 mr-2">✓</span>
+                 {{ feature }}
+               </li>
+             </ul>
+             
+             <!-- CTA Button -->
+             <button 
+               :class="[
+                 'w-full px-6 py-3 rounded-lg font-capture font-bold transition-all duration-300',
+                 course.isPopular
+                   ? 'bg-yellow-400 text-black hover:bg-yellow-500'
+                   : 'bg-transparent border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black'
+               ]"
+             >
+               SOLICITAR COTIZACIÓN
+             </button>
+           </div>
+         </div>
+
+         <!-- Empty State -->
+         <div v-else-if="!loading" class="text-center py-12">
+           <div class="text-6xl mb-4">🎹</div>
+           <p class="text-gray-400 text-lg">No hay paquetes de cursos disponibles</p>
+           <p class="text-gray-500 text-sm mt-2">Los precios se gestionan desde el panel de administración</p>
+         </div>
+
+         <!-- Fallback - Original hardcoded content if no dynamic data -->
+         <div v-if="!loading && activeCourses.length === 0" class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto mt-8">
            <!-- Paquete Básico -->
            <div class="bg-black bg-opacity-40 rounded-xl p-8 backdrop-blur-sm border border-yellow-400 border-opacity-20 hover:border-opacity-40 transition-all duration-300">
              <div class="text-center mb-6">
@@ -76,109 +142,6 @@
                <li class="flex items-center">
                  <span class="text-yellow-400 mr-2">✓</span>
                  Material didáctico incluido
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Grabación de la clase
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Seguimiento personalizado
-               </li>
-             </ul>
-             <button class="w-full bg-transparent border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black px-6 py-3 rounded-lg font-capture font-bold transition-all duration-300">
-               SOLICITAR COTIZACIÓN
-             </button>
-           </div>
-
-           <!-- Paquete Popular -->
-           <div class="bg-black bg-opacity-40 rounded-xl p-8 backdrop-blur-sm border-2 border-yellow-400 hover:border-opacity-60 transition-all duration-300 transform scale-105 relative">
-             <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 bg-yellow-400 text-black px-4 py-1 rounded-full text-sm font-capture font-bold">
-               MÁS POPULAR
-             </div>
-             <div class="text-center mb-6">
-               <h3 class="text-2xl font-capture text-yellow-400 mb-2">INTERMEDIO</h3>
-               <p class="text-gray-300 text-sm mb-4">Ideal para progreso rápido</p>
-               <div class="flex items-center justify-center gap-2 mb-2">
-                 <span class="text-2xl text-gray-500 line-through">$140.000</span>
-                 <span class="bg-red-500 text-white px-2 py-1 rounded text-xs font-bold">-29%</span>
-               </div>
-               <div class="text-4xl font-capture text-white mb-2">$100.000</div>
-               <div class="text-gray-400 text-sm">CLP / 4 clases mensuales</div>
-               <div class="text-green-400 text-xs mt-1">Ahorra $40.000</div>
-             </div>
-             <ul class="space-y-3 text-sm text-gray-300 mb-8">
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 4 clases mensuales de 1 hora
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Presencial u online
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Material didáctico premium
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Grabación de todas las clases
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Soporte WhatsApp 24/7
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Plan de estudios personalizado
-               </li>
-             </ul>
-             <button class="w-full bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-3 rounded-lg font-capture font-bold transition-all duration-300 transform hover:scale-105">
-               INSCRIBIRSE AHORA
-             </button>
-           </div>
-
-           <!-- Paquete Premium -->
-           <div class="bg-black bg-opacity-40 rounded-xl p-8 backdrop-blur-sm border border-yellow-400 border-opacity-20 hover:border-opacity-40 transition-all duration-300">
-             <div class="text-center mb-6">
-               <h3 class="text-2xl font-capture text-yellow-400 mb-2">PREMIUM</h3>
-               <p class="text-gray-300 text-sm mb-4">Para músicos serios</p>
-               <div class="text-4xl font-capture text-white mb-2">$180.000</div>
-               <div class="text-gray-400 text-sm">CLP / 8 clases mensuales</div>
-               <div class="text-green-400 text-xs mt-1">Ahorra $60.000</div>
-             </div>
-             <ul class="space-y-3 text-sm text-gray-300 mb-8">
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 8 clases mensuales de 1 hora
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Presencial u online
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Material didáctico premium
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Grabación de todas las clases
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Soporte WhatsApp 24/7
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Plan de estudios personalizado
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Masterclass grupal mensual
-               </li>
-               <li class="flex items-center">
-                 <span class="text-yellow-400 mr-2">✓</span>
-                 Acceso a biblioteca de recursos
                </li>
              </ul>
              <button class="w-full bg-transparent border-2 border-yellow-400 text-yellow-400 hover:bg-yellow-400 hover:text-black px-6 py-3 rounded-lg font-capture font-bold transition-all duration-300">
@@ -450,6 +413,24 @@
 </template>
 
 <script setup lang="ts">
+// 🎯 DATOS DINÁMICOS DESDE EL PANEL DE ADMIN
+const { loadPrices, coursePrices, loading } = useAdminPrices()
+
+// Cargar precios al montar la página
+onMounted(async () => {
+  await loadPrices()
+})
+
+// Cursos activos desde el panel de administración
+const activeCourses = computed(() => 
+  coursePrices.value.filter((course: any) => course.isActive)
+)
+
+// Función para formatear precios
+const formatPrice = (price: number) => {
+  return new Intl.NumberFormat('es-CL').format(price)
+}
+
 useHead({
   title: 'Cursos y Clases - Andy Jaque',
   meta: [
