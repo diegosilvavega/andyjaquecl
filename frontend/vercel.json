@@ -2,13 +2,6 @@
   "framework": "nuxtjs",
   "buildCommand": "npm run build",
   "outputDirectory": ".output/public",
-  "routes": [
-    {
-      "src": "/.*",
-      "dest": "/",
-      "status": 200
-    }
-  ],
   "env": {
     "NUXT_PUBLIC_SITE_URL": "https://andyjaquecl.vercel.app"
   }
