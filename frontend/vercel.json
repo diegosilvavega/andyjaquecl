@@ -1,0 +1,16 @@
+{
+  "framework": "nuxt",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".output/public",
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/"
+    }
+  ],
+  "functions": {
+    "app.js": {
+      "includeFiles": ".output/**"
+    }
+  }
+} 
