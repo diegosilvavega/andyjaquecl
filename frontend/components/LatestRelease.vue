@@ -125,8 +125,31 @@ const featuredVideos = computed(() =>
 )
 
 // Funciones de utilidad
-const formatDate = (date: Date | string) => {
-  const d = typeof date === 'string' ? new Date(date) : date
+const formatDate = (date: any) => {
+  let d: Date
+  
+  // Manejar diferentes tipos de fecha
+  if (!date) {
+    d = new Date()
+  } else if (date instanceof Date) {
+    d = date
+  } else if (typeof date === 'string') {
+    d = new Date(date)
+  } else if (date.toDate && typeof date.toDate === 'function') {
+    // Firebase Timestamp
+    d = date.toDate()
+  } else if (date.seconds) {
+    // Firebase Timestamp object format
+    d = new Date(date.seconds * 1000)
+  } else {
+    d = new Date(date)
+  }
+  
+  // Verificar que sea una fecha válida
+  if (isNaN(d.getTime())) {
+    return 'Fecha no válida'
+  }
+  
   return d.toLocaleDateString('es-ES', { 
     year: 'numeric', 
     month: 'long', 

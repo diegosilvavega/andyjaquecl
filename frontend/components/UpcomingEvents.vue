@@ -129,12 +129,54 @@ onMounted(async () => {
 // Eventos dinámicos desde el panel de administración
 const events = computed(() => upcomingEvents.value)
 
-const formatMonth = (date: Date) => {
-  return date.toLocaleDateString('es-ES', { month: 'short' }).toUpperCase()
+const formatMonth = (date: any) => {
+  let d: Date
+  
+  // Manejar diferentes tipos de fecha
+  if (!date) {
+    d = new Date()
+  } else if (date instanceof Date) {
+    d = date
+  } else if (typeof date === 'string') {
+    d = new Date(date)
+  } else if (date.toDate && typeof date.toDate === 'function') {
+    // Firebase Timestamp
+    d = date.toDate()
+  } else if (date.seconds) {
+    // Firebase Timestamp object format
+    d = new Date(date.seconds * 1000)
+  } else {
+    d = new Date(date)
+  }
+  
+  if (isNaN(d.getTime())) return 'ERR'
+  
+  return d.toLocaleDateString('es-ES', { month: 'short' }).toUpperCase()
 }
 
-const formatDay = (date: Date) => {
-  return date.getDate().toString().padStart(2, '0')
+const formatDay = (date: any) => {
+  let d: Date
+  
+  // Manejar diferentes tipos de fecha
+  if (!date) {
+    d = new Date()
+  } else if (date instanceof Date) {
+    d = date
+  } else if (typeof date === 'string') {
+    d = new Date(date)
+  } else if (date.toDate && typeof date.toDate === 'function') {
+    // Firebase Timestamp
+    d = date.toDate()
+  } else if (date.seconds) {
+    // Firebase Timestamp object format
+    d = new Date(date.seconds * 1000)
+  } else {
+    d = new Date(date)
+  }
+  
+  if (isNaN(d.getTime())) return '00'
+  
+  return d.getDate().toString().padStart(2, '0')
 }
 
 const formatTime = (time: string) => {
