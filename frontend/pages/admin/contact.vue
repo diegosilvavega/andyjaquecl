@@ -24,16 +24,7 @@
         <p class="text-gray-300">Cargando información de contacto...</p>
       </div>
 
-      <!-- Error State -->
-      <div v-else-if="error" class="bg-red-600/20 border border-red-500 rounded-xl p-6 mb-8">
-        <p class="text-red-400">{{ error }}</p>
-        <button 
-          @click="loadAllContactData" 
-          class="mt-4 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-lg font-capture"
-        >
-          Reintentar
-        </button>
-      </div>
+      <!-- Error State - Removed -->
 
       <!-- Content -->
       <div v-else>
@@ -50,15 +41,7 @@
               </div>
             </div>
             
-            <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="text-gray-400 text-sm">Contactos Profesionales</p>
-                  <p class="text-2xl font-bold text-white">{{ contactStats.publicProfessionalContacts }}/{{ contactStats.totalProfessionalContacts }}</p>
-                </div>
-                <div class="text-green-400 text-2xl">👔</div>
-              </div>
-            </div>
+
             
             <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
               <div class="flex items-center justify-between">
@@ -252,7 +235,10 @@
               >
                 <div class="flex items-center justify-between mb-4">
                   <div class="flex items-center space-x-3">
-                    <span class="text-2xl">{{ getSocialIcon(social.platform) }}</span>
+                    <div class="w-8 h-8 rounded-lg flex items-center justify-center" :class="getSocialIconBg(social.platform)">
+                      <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 24 24" v-html="getSocialIcon(social.platform)">
+                      </svg>
+                    </div>
                     <span class="font-capture text-yellow-400">{{ social.platform.toUpperCase() }}</span>
                   </div>
                   <div class="flex items-center space-x-2">
@@ -309,105 +295,6 @@
             </div>
           </div>
 
-          <!-- Contactos Profesionales -->
-          <div v-else-if="activeTab === 'professional'" class="p-6">
-            <div class="flex justify-between items-center mb-6">
-              <h2 class="text-xl font-capture text-yellow-400">CONTACTOS PROFESIONALES</h2>
-              <button
-                @click="showProfessionalModal = true"
-                class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-capture flex items-center space-x-2"
-              >
-                <span>➕</span>
-                <span>Agregar Contacto</span>
-              </button>
-            </div>
-
-            <div class="space-y-6">
-              <div
-                v-for="contact in professionalContacts"
-                :key="contact.id"
-                class="bg-gray-700 rounded-xl p-6 border border-gray-600 hover:border-yellow-400 transition-colors"
-              >
-                <div class="flex items-start justify-between">
-                  <div class="flex-1">
-                    <div class="flex items-center space-x-3 mb-3">
-                      <span class="text-2xl">{{ getProfessionalIcon(contact.type) }}</span>
-                      <span
-                        :class="[
-                          'px-3 py-1 rounded-full text-xs font-medium uppercase',
-                          getProfessionalColor(contact.type)
-                        ]"
-                      >
-                        {{ contact.type }}
-                      </span>
-                      <span
-                        :class="[
-                          'w-2 h-2 rounded-full',
-                          contact.isPublic ? 'bg-green-400' : 'bg-gray-400'
-                        ]"
-                      ></span>
-                      <span class="text-xs text-gray-400">
-                        {{ contact.isPublic ? 'Público' : 'Privado' }}
-                      </span>
-                    </div>
-                    
-                    <h3 class="text-lg font-medium text-white mb-2">{{ contact.name }}</h3>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                      <div>
-                        <p class="text-gray-400">Email:</p>
-                        <p class="text-white">{{ contact.email }}</p>
-                      </div>
-                      <div v-if="contact.phone">
-                        <p class="text-gray-400">Teléfono:</p>
-                        <p class="text-white">{{ contact.phone }}</p>
-                      </div>
-                      <div v-if="contact.company">
-                        <p class="text-gray-400">Empresa:</p>
-                        <p class="text-white">{{ contact.company }}</p>
-                      </div>
-                      <div v-if="contact.role">
-                        <p class="text-gray-400">Cargo:</p>
-                        <p class="text-white">{{ contact.role }}</p>
-                      </div>
-                    </div>
-                    
-                    <div v-if="contact.notes" class="mt-4">
-                      <p class="text-gray-400 text-sm">Notas:</p>
-                      <p class="text-gray-300 text-sm">{{ contact.notes }}</p>
-                    </div>
-                  </div>
-                  
-                  <div class="flex space-x-2 ml-4">
-                    <button
-                      @click="editProfessionalContact(contact)"
-                      class="text-yellow-400 hover:text-yellow-300 p-2"
-                      title="Editar"
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      @click="confirmDeleteProfessionalContact(contact)"
-                      class="text-red-400 hover:text-red-300 p-2"
-                      title="Eliminar"
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </div>
-              </div>
-              
-              <!-- Empty State -->
-              <div
-                v-if="professionalContacts.length === 0"
-                class="text-center py-12 text-gray-500"
-              >
-                <div class="text-4xl mb-4">👔</div>
-                <p>No hay contactos profesionales configurados</p>
-              </div>
-            </div>
-          </div>
-
           <!-- Configuraciones -->
           <div v-else-if="activeTab === 'settings'" class="p-6">
             <div class="flex justify-between items-center mb-6">
@@ -441,7 +328,7 @@
                   <div class="flex items-center justify-between">
                     <label class="text-gray-300">Mostrar contactos profesionales</label>
                     <input
-                      v-model="settingsForm.showProfessionalContacts"
+                      disabled
                       type="checkbox"
                       class="w-5 h-5 text-yellow-400 bg-gray-700 border-gray-600 rounded focus:ring-yellow-400"
                     >
@@ -591,124 +478,6 @@
       </div>
     </div>
 
-    <!-- Professional Contact Modal -->
-    <div
-      v-if="showProfessionalModal"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
-      @click.self="closeProfessionalModal"
-    >
-      <div class="bg-gray-800 rounded-xl p-6 w-full max-w-lg mx-4 border border-gray-700">
-        <h3 class="text-lg font-capture text-yellow-400 mb-4">
-          {{ editingProfessionalContact ? 'EDITAR CONTACTO' : 'AGREGAR CONTACTO' }}
-        </h3>
-        
-        <form @submit.prevent="saveProfessionalContact" class="space-y-4">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-400 mb-1">Tipo *</label>
-              <select
-                v-model="professionalForm.type"
-                required
-                class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-yellow-400"
-              >
-                <option value="">Seleccionar tipo</option>
-                <option value="manager">Manager</option>
-                <option value="booking">Booking</option>
-                <option value="press">Prensa</option>
-                <option value="label">Disquera</option>
-                <option value="publisher">Editorial</option>
-              </select>
-            </div>
-            
-            <div>
-              <label class="block text-sm font-medium text-gray-400 mb-1">Nombre *</label>
-              <input
-                v-model="professionalForm.name"
-                type="text"
-                required
-                class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-yellow-400"
-              >
-            </div>
-          </div>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-400 mb-1">Email *</label>
-              <input
-                v-model="professionalForm.email"
-                type="email"
-                required
-                class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-yellow-400"
-              >
-            </div>
-            
-            <div>
-              <label class="block text-sm font-medium text-gray-400 mb-1">Teléfono</label>
-              <input
-                v-model="professionalForm.phone"
-                type="tel"
-                class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-yellow-400"
-              >
-            </div>
-          </div>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-            <div>
-              <label class="block text-sm font-medium text-gray-400 mb-1">Empresa</label>
-              <input
-                v-model="professionalForm.company"
-                type="text"
-                class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-yellow-400"
-              >
-            </div>
-            
-            <div>
-              <label class="block text-sm font-medium text-gray-400 mb-1">Cargo</label>
-              <input
-                v-model="professionalForm.role"
-                type="text"
-                class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-yellow-400"
-              >
-            </div>
-          </div>
-          
-          <div>
-            <label class="block text-sm font-medium text-gray-400 mb-1">Notas</label>
-            <textarea
-              v-model="professionalForm.notes"
-              rows="3"
-              class="w-full p-3 bg-gray-700 border border-gray-600 rounded-lg text-white focus:ring-2 focus:ring-yellow-400"
-            ></textarea>
-          </div>
-          
-          <div class="flex items-center justify-between">
-            <label class="text-gray-300">Público (visible en el sitio web)</label>
-            <input
-              v-model="professionalForm.isPublic"
-              type="checkbox"
-              class="w-5 h-5 text-yellow-400 bg-gray-700 border-gray-600 rounded focus:ring-yellow-400"
-            >
-          </div>
-          
-          <div class="flex justify-end space-x-4 pt-4">
-            <button
-              type="button"
-              @click="closeProfessionalModal"
-              class="px-4 py-2 bg-gray-600 hover:bg-gray-700 text-white rounded-lg"
-            >
-              Cancelar
-            </button>
-            <button
-              type="submit"
-              class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg"
-            >
-              {{ editingProfessionalContact ? 'Actualizar' : 'Crear' }}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
     <!-- Confirmation Modal -->
     <div
       v-if="showConfirmModal"
@@ -741,7 +510,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ContactInfo, SocialMedia, ProfessionalContact, ContactSettings } from '~/types/admin'
+import type { ContactInfo, SocialMedia, ContactSettings } from '~/types/admin'
 
 // Meta
 definePageMeta({
@@ -752,32 +521,24 @@ definePageMeta({
 const {
   contactInfo,
   socialMediaList,
-  professionalContacts,
   contactSettings,
   loading,
-  error,
   contactStats,
-  loadAllContactData,
+  loadContactData,
   updateContactInfo,
-  createSocialMedia,
+  addSocialMedia,
   updateSocialMedia,
-  deleteSocialMedia,
-  createProfessionalContact,
-  updateProfessionalContact,
-  deleteProfessionalContact,
-  updateContactSettings
+  deleteSocialMedia
 } = useAdminContact()
 
 // State
 const activeTab = ref('info')
 const editingContact = ref(false)
 const showSocialModal = ref(false)
-const showProfessionalModal = ref(false)
 const showConfirmModal = ref(false)
 const editingSocialMedia = ref<SocialMedia | null>(null)
-const editingProfessionalContact = ref<ProfessionalContact | null>(null)
 const itemToDelete = ref<any>(null)
-const deleteType = ref<'social' | 'professional'>('social')
+const deleteType = ref<'social'>('social')
 
 // Forms
 const contactForm = ref<Partial<ContactInfo>>({})
@@ -788,17 +549,6 @@ const socialForm = ref<Partial<SocialMedia>>({
   displayName: '',
   isActive: true,
   order: 1
-})
-const professionalForm = ref<Partial<ProfessionalContact>>({
-  type: undefined,
-  name: '',
-  email: '',
-  phone: '',
-  company: '',
-  role: '',
-  isPublic: true,
-  order: 1,
-  notes: ''
 })
 const settingsForm = ref<Partial<ContactSettings>>({})
 
@@ -817,12 +567,6 @@ const tabs = computed(() => [
     count: contactStats.value.activeSocialMedia
   },
   {
-    id: 'professional',
-    label: 'Contactos Pro',
-    icon: '👔',
-    count: contactStats.value.publicProfessionalContacts
-  },
-  {
     id: 'settings',
     label: 'Configuraciones',
     icon: '⚙️',
@@ -833,35 +577,24 @@ const tabs = computed(() => [
 // Methods
 const getSocialIcon = (platform: string) => {
   const icons: Record<string, string> = {
-    instagram: '📸',
-    facebook: '📘',
-    youtube: '📺',
-    tiktok: '🎵',
-    spotify: '🎧'
+    instagram: '<path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>',
+    facebook: '<path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>',
+    youtube: '<path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>',
+    tiktok: '<path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>',
+    spotify: '<path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/>'
   }
-  return icons[platform] || '🌐'
+  return icons[platform] || '<path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>'
 }
 
-const getProfessionalIcon = (type: string) => {
-  const icons: Record<string, string> = {
-    manager: '👨‍💼',
-    booking: '📅',
-    press: '📰',
-    label: '💿',
-    publisher: '📚'
+const getSocialIconBg = (platform: string) => {
+  const backgrounds: Record<string, string> = {
+    instagram: 'bg-gradient-to-br from-purple-500 to-pink-500',
+    facebook: 'bg-blue-600',
+    youtube: 'bg-red-600',
+    tiktok: 'bg-gradient-to-br from-red-500 to-blue-600',
+    spotify: 'bg-green-500'
   }
-  return icons[type] || '👔'
-}
-
-const getProfessionalColor = (type: string) => {
-  const colors: Record<string, string> = {
-    manager: 'bg-blue-600 text-blue-100',
-    booking: 'bg-green-600 text-green-100',
-    press: 'bg-purple-600 text-purple-100',
-    label: 'bg-red-600 text-red-100',
-    publisher: 'bg-yellow-600 text-yellow-100'
-  }
-  return colors[type] || 'bg-gray-600 text-gray-100'
+  return backgrounds[platform] || 'bg-gray-600'
 }
 
 // Contact Info Methods
@@ -891,7 +624,12 @@ const saveSocialMedia = async () => {
     if (editingSocialMedia.value) {
       await updateSocialMedia(editingSocialMedia.value.id, socialForm.value)
     } else {
-      await createSocialMedia(socialForm.value as Omit<SocialMedia, 'id'>)
+              await addSocialMedia(
+          socialForm.value.platform!,
+          socialForm.value.username!,
+          socialForm.value.url!,
+          socialForm.value.displayName!
+        )
     }
     closeSocialModal()
   } catch (err) {
@@ -918,52 +656,10 @@ const confirmDeleteSocialMedia = (social: SocialMedia) => {
   showConfirmModal.value = true
 }
 
-// Professional Contact Methods
-const editProfessionalContact = (contact: ProfessionalContact) => {
-  editingProfessionalContact.value = contact
-  professionalForm.value = { ...contact }
-  showProfessionalModal.value = true
-}
-
-const saveProfessionalContact = async () => {
-  try {
-    if (editingProfessionalContact.value) {
-      await updateProfessionalContact(editingProfessionalContact.value.id, professionalForm.value)
-    } else {
-      await createProfessionalContact(professionalForm.value as Omit<ProfessionalContact, 'id' | 'updatedAt'>)
-    }
-    closeProfessionalModal()
-  } catch (err) {
-    console.error('Error saving professional contact:', err)
-  }
-}
-
-const closeProfessionalModal = () => {
-  showProfessionalModal.value = false
-  editingProfessionalContact.value = null
-  professionalForm.value = {
-    type: undefined,
-    name: '',
-    email: '',
-    phone: '',
-    company: '',
-    role: '',
-    isPublic: true,
-    order: 1,
-    notes: ''
-  }
-}
-
-const confirmDeleteProfessionalContact = (contact: ProfessionalContact) => {
-  itemToDelete.value = contact
-  deleteType.value = 'professional'
-  showConfirmModal.value = true
-}
-
 // Settings Methods
 const saveContactSettings = async () => {
   try {
-    await updateContactSettings(settingsForm.value)
+            // Funcionalidad de configuración removida temporalmente
   } catch (err) {
     console.error('Error saving contact settings:', err)
   }
@@ -974,8 +670,6 @@ const confirmDelete = async () => {
   try {
     if (deleteType.value === 'social' && itemToDelete.value) {
       await deleteSocialMedia(itemToDelete.value.id)
-    } else if (deleteType.value === 'professional' && itemToDelete.value) {
-      await deleteProfessionalContact(itemToDelete.value.id)
     }
     showConfirmModal.value = false
     itemToDelete.value = null
@@ -999,7 +693,7 @@ watch(contactSettings, (newSettings) => {
 
 // Initialize
 onMounted(() => {
-  loadAllContactData()
+  loadContactData()
 })
 </script>
 

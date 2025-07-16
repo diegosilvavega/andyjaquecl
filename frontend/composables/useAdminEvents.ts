@@ -8,124 +8,99 @@ export const useAdminEvents = () => {
   const saving = ref(false)
   const error = ref('')
 
-  // Datos hardcodeados actuales (migrar a Firebase después)
-  const defaultEvents: Event[] = [
-    {
-      id: '1',
-      date: new Date(2025, 6, 18), // Julio es mes 6 (0-indexado)
-      time: '21:30',
-      venue: 'Ovalle Casino Resort',
-      city: 'Ovalle',
-      isSpecial: false,
-      isPrivate: false,
-      status: 'active',
-      description: 'Información entradas: próximamente'
-    },
-    {
-      id: '2',
-      date: new Date(2025, 7, 1), // Agosto es mes 7
-      time: '20:00',
-      venue: 'OVO Beach Coquimbo',
-      city: 'Coquimbo',
-      isSpecial: true,
-      specialText: 'Aniversario Andy Jaque y su Banda',
-      isPrivate: false,
-      status: 'active',
-      description: 'Información entradas: próximamente'
-    },
-    {
-      id: '3',
-      date: new Date(2025, 7, 8), // Agosto es mes 7
-      time: '21:00',
-      venue: 'Enjoy Antofagasta',
-      city: 'Antofagasta',
-      isSpecial: false,
-      isPrivate: false,
-      status: 'active',
-      description: 'Información entradas: próximamente'
-    },
-    {
-      id: '4',
-      date: new Date(2025, 7, 14), // Agosto es mes 7
-      time: '21:30',
-      venue: 'Fraternidad La Diablada',
-      city: 'Calama',
-      isSpecial: false,
-      isPrivate: false,
-      status: 'active',
-      description: 'Información entradas: próximamente'
-    },
-    {
-      id: '5',
-      date: new Date(2025, 7, 28), // Agosto es mes 7
-      time: '22:00',
-      venue: 'Salón Refugio Tropical',
-      city: 'Copiapó',
-      isSpecial: false,
-      isPrivate: false,
-      status: 'active',
-      description: 'Información entradas: próximamente'
-    },
-    {
-      id: '6',
-      date: new Date(2025, 7, 29), // Agosto es mes 7
-      time: '20:00',
-      venue: 'Evento privado',
-      city: 'Copiapó',
-      isSpecial: false,
-      isPrivate: true,
-      status: 'active',
-      description: 'Evento privado - Información entradas: n/a'
-    },
-    {
-      id: '7',
-      date: new Date(2025, 7, 31), // Agosto es mes 7
-      time: '21:00',
-      venue: 'Evento privado',
-      city: 'La Serena',
-      isSpecial: false,
-      isPrivate: true,
-      status: 'active',
-      description: 'Evento privado - Información entradas: n/a'
+  // Función para usar Firebase
+  const useFirebaseIfAvailable = () => {
+    try {
+      // Intentar usar Firebase global primero (para páginas públicas)
+      const globalFirebase = useFirebaseGlobal()
+      if (globalFirebase.isAvailable.value) {
+        return { 
+          loadEvents: globalFirebase.loadEvents,
+          available: true,
+          isGlobal: true
+        }
+      }
+      
+      // Fallback: usar admin Firebase (para páginas admin)
+      const { loadEvents: loadFirebaseEvents, saveEvents: saveFirebaseEvents, isConnected } = useFirestoreAdmin()
+      if (isConnected.value) {
+        return { 
+          loadEvents: loadFirebaseEvents, 
+          saveEvents: saveFirebaseEvents,
+          isConnected,
+          available: true,
+          isGlobal: false
+        }
+      }
+      
+      return { available: false }
+    } catch (error) {
+      console.error('❌ Firebase no disponible para eventos')
+      return { available: false }
     }
-  ]
+  }
 
-  // Cargar eventos
+  // Cargar eventos desde Firebase
   const loadEvents = async () => {
     loading.value = true
     error.value = ''
     
     try {
-      // Simulamos carga desde localStorage (después será Firebase)
-      const savedEvents = localStorage.getItem('admin_events')
-      if (savedEvents) {
-        const parsed = JSON.parse(savedEvents)
-        events.value = parsed.map((event: any) => ({
-          ...event,
-          date: new Date(event.date) // Asegurar que sea Date object
-        })).filter((event: any) => !isNaN(event.date.getTime())) // Filtrar fechas inválidas
-      } else {
-        // Cargar eventos por defecto
-        events.value = defaultEvents
-        await saveEventsToStorage()
+      const firebase = useFirebaseIfAvailable()
+      if (!firebase.available || !firebase.loadEvents) {
+        throw new Error('Firebase no disponible')
       }
+
+      const firebaseEvents = await firebase.loadEvents()
+      events.value = firebaseEvents.map((event: any) => {
+        // Convertir fecha de manera robusta
+        let dateObj: Date
+        try {
+          if (event.date instanceof Date) {
+            dateObj = event.date
+          } else if (event.date && typeof event.date === 'object' && event.date.toDate) {
+            dateObj = event.date.toDate()
+          } else if (event.date && typeof event.date === 'object' && event.date.seconds) {
+            dateObj = new Date(event.date.seconds * 1000)
+          } else {
+            dateObj = new Date(event.date)
+          }
+          
+          if (isNaN(dateObj.getTime())) {
+            throw new Error('Invalid date')
+          }
+        } catch (error) {
+          dateObj = new Date()
+        }
+        
+        return {
+          ...event,
+          date: dateObj
+        }
+      }) as Event[]
       
-      // Reordenar eventos después de cargar
       await reorderEvents()
     } catch (err) {
-      error.value = 'Error al cargar los eventos'
+      error.value = 'Error al cargar eventos desde Firebase'
       console.error('Error loading events:', err)
+      events.value = []
     } finally {
       loading.value = false
     }
   }
 
-  // Guardar eventos en localStorage (temporal)
+  // Guardar eventos en Firebase
   const saveEventsToStorage = async () => {
     try {
-      localStorage.setItem('admin_events', JSON.stringify(events.value))
+      const firebase = useFirebaseIfAvailable()
+      if (firebase.available && firebase.saveEvents) {
+        await firebase.saveEvents(events.value)
+      } else {
+        throw new Error('Firebase no disponible para guardar')
+      }
     } catch (err) {
       console.error('Error saving events:', err)
+      throw err
     }
   }
 
@@ -137,11 +112,12 @@ export const useAdminEvents = () => {
     try {
       const newEvent: Event = {
         ...eventData,
-        id: Date.now().toString() // Simple ID generation
+        id: Date.now().toString()
       }
 
       events.value.push(newEvent)
-      await reorderEvents() // Reordenar después de crear
+      await saveEventsToStorage()
+      await reorderEvents()
       return { success: true, data: newEvent }
     } catch (err) {
       error.value = 'Error al crear el evento'
@@ -163,7 +139,8 @@ export const useAdminEvents = () => {
       }
 
       events.value[index] = { ...events.value[index], ...eventData }
-      await reorderEvents() // Reordenar después de actualizar
+      await saveEventsToStorage()
+      await reorderEvents()
       return { success: true, data: events.value[index] }
     } catch (err) {
       error.value = 'Error al actualizar el evento'
@@ -185,7 +162,7 @@ export const useAdminEvents = () => {
       }
 
       events.value.splice(index, 1)
-      await reorderEvents() // Reordenar después de eliminar
+      await saveEventsToStorage()
       return { success: true }
     } catch (err) {
       error.value = 'Error al eliminar el evento'
@@ -195,171 +172,51 @@ export const useAdminEvents = () => {
     }
   }
 
-  // Obtener eventos futuros
-  const getUpcomingEvents = computed(() => {
-    const now = new Date()
-    now.setHours(0, 0, 0, 0) // Comparar solo fechas, no horas
-    
-    return events.value
-      .filter(event => {
-        const eventDate = new Date(event.date)
-        eventDate.setHours(0, 0, 0, 0)
-        return eventDate >= now && event.status === 'active'
-      })
-      .sort((a, b) => {
-        const dateA = new Date(a.date).getTime()
-        const dateB = new Date(b.date).getTime()
-        
-        // Si las fechas son iguales, ordenar por hora
-        if (dateA === dateB) {
-          const timeA = a.time.split(':').map(Number)
-          const timeB = b.time.split(':').map(Number)
-          return (timeA[0] * 60 + timeA[1]) - (timeB[0] * 60 + timeB[1])
-        }
-        
-        return dateA - dateB
-      })
-  })
-
-  // Obtener evento por ID
-  const getEventById = (id: string) => {
-    return events.value.find(event => event.id === id)
-  }
-
-  // Formatear fecha
-  const formatEventDate = (date: Date) => {
-    return new Intl.DateTimeFormat('es-ES', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric'
-    }).format(date)
-  }
-
-  // Formatear fecha corta
-  const formatShortDate = (date: Date) => {
-    return new Intl.DateTimeFormat('es-ES', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    }).format(date)
-  }
-
-  // Validar evento
-  const validateEvent = (eventData: Partial<Event>) => {
-    const errors: string[] = []
-
-    if (!eventData.venue || eventData.venue.trim() === '') {
-      errors.push('El venue es requerido')
-    }
-
-    if (!eventData.city || eventData.city.trim() === '') {
-      errors.push('La ciudad es requerida')
-    }
-
-    if (!eventData.date) {
-      errors.push('La fecha es requerida')
-    } else if (eventData.date < new Date()) {
-      errors.push('La fecha no puede ser en el pasado')
-    }
-
-    if (!eventData.time || eventData.time.trim() === '') {
-      errors.push('La hora es requerida')
-    }
-
-    if (eventData.price && eventData.price < 0) {
-      errors.push('El precio no puede ser negativo')
-    }
-
-    if (eventData.ticketUrl && !isValidUrl(eventData.ticketUrl)) {
-      errors.push('La URL de tickets no es válida')
-    }
-
-    return {
-      isValid: errors.length === 0,
-      errors
-    }
-  }
-
-  // Validar URL
-  const isValidUrl = (string: string) => {
-    try {
-      new URL(string)
-      return true
-    } catch (_) {
-      return false
-    }
-  }
-
-  // Obtener estadísticas
-  const getEventStats = computed(() => {
-    const now = new Date()
-    now.setHours(0, 0, 0, 0)
-    
-    const upcoming = events.value.filter(e => {
-      const eventDate = new Date(e.date)
-      eventDate.setHours(0, 0, 0, 0)
-      return eventDate >= now && e.status === 'active'
-    }).length
-    
-    const private_events = events.value.filter(e => {
-      const eventDate = new Date(e.date)
-      eventDate.setHours(0, 0, 0, 0)
-      return e.isPrivate && eventDate >= now
-    }).length
-    
-    const special = events.value.filter(e => {
-      const eventDate = new Date(e.date)
-      eventDate.setHours(0, 0, 0, 0)
-      return e.isSpecial && eventDate >= now
-    }).length
-    
-    const total = events.value.length
-
-    return {
-      upcoming,
-      private: private_events,
-      special,
-      total
-    }
-  })
-
-  // Función para reordenar y limpiar eventos (temporal para desarrollo)
+  // Reordenar eventos por fecha
   const reorderEvents = async () => {
-    // Ordenar eventos por fecha y hora
     events.value.sort((a, b) => {
       const dateA = new Date(a.date).getTime()
       const dateB = new Date(b.date).getTime()
-      
-      if (dateA === dateB) {
-        const timeA = a.time.split(':').map(Number)
-        const timeB = b.time.split(':').map(Number)
-        return (timeA[0] * 60 + timeA[1]) - (timeB[0] * 60 + timeB[1])
-      }
-      
       return dateA - dateB
     })
-    
-    await saveEventsToStorage()
   }
 
-  // Función para resetear eventos a los valores por defecto actualizados
-  const resetEventsToDefaults = async () => {
-    try {
-      // Limpiar eventos del localStorage
-      localStorage.removeItem('admin_events')
-      
-      // Cargar eventos por defecto
-      events.value = [...defaultEvents]
-      await saveEventsToStorage()
-      
-      console.log('✅ Eventos reseteados a los valores por defecto actualizados')
-      return { success: true }
-    } catch (err) {
-      console.error('Error al resetear eventos:', err)
-      return { success: false, error: 'Error al resetear eventos' }
+  // Cambiar estado de evento
+  const toggleEventStatus = async (eventId: string) => {
+    const event = events.value.find(e => e.id === eventId)
+    if (event) {
+      const newStatus = event.status === 'active' ? 'cancelled' : 'active'
+      return await updateEvent(eventId, { status: newStatus })
     }
+    return { success: false, error: 'Evento no encontrado' }
   }
+
+  // Obtener eventos próximos (públicos activos)
+  const upcomingEvents = computed(() => {
+    const now = new Date()
+    return events.value
+      .filter(event => {
+        const eventDate = new Date(event.date)
+        return event.status === 'active' && 
+               !event.isPrivate && 
+               eventDate >= now
+      })
+      .slice(0, 5)
+  })
+
+  // Obtener todos los eventos activos
+  const activeEvents = computed(() => 
+    events.value.filter(event => event.status === 'active')
+  )
+
+  // Estadísticas
+  const eventStats = computed(() => ({
+    total: events.value.length,
+    active: activeEvents.value.length,
+    upcoming: upcomingEvents.value.length,
+    private: events.value.filter(e => e.isPrivate).length,
+    special: events.value.filter(e => e.isSpecial).length
+  }))
 
   return {
     // Estado
@@ -368,22 +225,17 @@ export const useAdminEvents = () => {
     saving: readonly(saving),
     error: readonly(error),
 
+    // Datos computados
+    upcomingEvents,
+    activeEvents,
+    eventStats,
+
     // Acciones
     loadEvents,
     createEvent,
     updateEvent,
     deleteEvent,
-
-    // Getters
-    getUpcomingEvents,
-    getEventById,
-    getEventStats,
-
-    // Utilidades
-    formatEventDate,
-    formatShortDate,
-    validateEvent,
-    reorderEvents,
-    resetEventsToDefaults
+    toggleEventStatus,
+    reorderEvents
   }
 } 

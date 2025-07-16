@@ -36,6 +36,7 @@ Thumbs.db
 .firebase
 .firebaserc
 firebase-debug.log
+*firebase-adminsdk*.json
 firestore-debug.log
 
 # Testing

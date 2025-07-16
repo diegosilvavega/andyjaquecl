@@ -15,197 +15,121 @@ export const useAdminMedia = () => {
   const saving = ref(false)
   const error = ref('')
 
-  // Datos por defecto para canciones
-  const defaultSongs: Song[] = [
-    {
-      id: 'song-1',
-      title: 'Cumbia del Corazón',
-      artist: 'Andy Jaque',
-      album: 'Melodías del Alma',
-      duration: 245, // 4:05
-      audioUrl: '/audio/background-music.mp3',
-      genre: 'Cumbia',
-      releaseDate: new Date('2023-06-15'),
-      isActive: true,
-      isFeatured: true,
-      order: 1,
-      description: 'Una cumbia romántica que llega directo al corazón'
-    },
-    {
-      id: 'song-2', 
-      title: 'Noches de Fiesta',
-      artist: 'Andy Jaque',
-      album: 'Melodías del Alma',
-      duration: 198, // 3:18
-      audioUrl: '/audio/background-music.mp3',
-      genre: 'Cumbia',
-      releaseDate: new Date('2023-08-20'),
-      isActive: true,
-      isFeatured: false,
-      order: 2,
-      description: 'Perfecta para bailar toda la noche'
-    },
-    {
-      id: 'song-3',
-      title: 'Recuerdos de Mi Tierra',
-      artist: 'Andy Jaque',
-      duration: 267, // 4:27
-      audioUrl: '/audio/background-music.mp3',
-      genre: 'Cumbia Sureña',
-      releaseDate: new Date('2023-10-10'),
-      isActive: true,
-      isFeatured: true,
-      order: 3,
-      description: 'Un homenaje a las raíces musicales del sur de Chile'
+  // Función para usar Firebase
+  const useFirebaseIfAvailable = () => {
+    try {
+      // Intentar usar Firebase global primero (para páginas públicas)
+      const globalFirebase = useFirebaseGlobal()
+      if (globalFirebase.isAvailable.value) {
+        return { 
+          loadMedia: globalFirebase.loadMedia,
+          available: true,
+          isGlobal: true
+        }
+      }
+      
+      // Fallback: usar admin Firebase (para páginas admin)
+      const { loadMedia: loadFirebaseMedia, saveMedia: saveFirebaseMedia, isConnected } = useFirestoreAdmin()
+      if (isConnected.value) {
+        return { 
+          loadMedia: loadFirebaseMedia,
+          saveMedia: saveFirebaseMedia,
+          available: true,
+          isGlobal: false
+        }
+      }
+      
+      return { available: false }
+    } catch (error) {
+      console.error('❌ Firebase no disponible para media')
+      return { available: false }
     }
-  ]
-
-  // Datos por defecto para videos
-  const defaultVideos: Video[] = [
-    {
-      id: 'video-1',
-      title: 'Cumbia del Corazón - Video Oficial',
-      description: 'Video musical oficial de nuestro hit más popular',
-      videoUrl: 'https://youtube.com/watch?v=example1',
-      duration: 245,
-      category: 'music_video',
-      releaseDate: new Date('2023-06-20'),
-      isActive: true,
-      isFeatured: true,
-      order: 1,
-      viewCount: 15420
-    },
-    {
-      id: 'video-2',
-      title: 'En Vivo desde Puerto Montt',
-      description: 'Presentación completa en el Festival de Verano 2023',
-      videoUrl: 'https://youtube.com/watch?v=example2',
-      duration: 3600, // 1 hora
-      category: 'live_performance',
-      releaseDate: new Date('2023-07-15'),
-      isActive: true,
-      isFeatured: false,
-      order: 2,
-      viewCount: 8750
-    },
-    {
-      id: 'video-3',
-      title: 'Detrás de Cámaras - Grabación del Álbum',
-      description: 'Un vistazo al proceso creativo de "Melodías del Alma"',
-      videoUrl: 'https://youtube.com/watch?v=example3',
-      duration: 892, // 14:52
-      category: 'behind_scenes',
-      releaseDate: new Date('2023-09-05'),
-      isActive: true,
-      isFeatured: true,
-      order: 3,
-      viewCount: 3210
-    }
-  ]
-
-  // Datos por defecto para playlists
-  const defaultPlaylists: Playlist[] = [
-    {
-      id: 'playlist-1',
-      name: 'Grandes Éxitos',
-      description: 'Las canciones más populares de Andy Jaque',
-      songs: ['song-1', 'song-3'],
-      isActive: true,
-      isPublic: true,
-      order: 1,
-      createdAt: new Date('2023-06-01'),
-      updatedAt: new Date('2023-10-15')
-    },
-    {
-      id: 'playlist-2',
-      name: 'Para Bailar',
-      description: 'Las mejores cumbias para la pista de baile',
-      songs: ['song-2', 'song-1'],
-      isActive: true,
-      isPublic: true,
-      order: 2,
-      createdAt: new Date('2023-07-01'),
-      updatedAt: new Date('2023-08-25')
-    }
-  ]
-
-  // Configuración por defecto del reproductor
-  const defaultPlayerSettings: PlayerSettings = {
-    autoplay: false,
-    volume: 75,
-    showVisualizer: true,
-    defaultPlaylist: 'playlist-1',
-    shuffleMode: false,
-    repeatMode: 'none',
-    crossfade: 3
   }
 
-  // Cargar multimedia desde localStorage
+  // Cargar multimedia desde Firebase
   const loadMedia = async () => {
     loading.value = true
     error.value = ''
     
     try {
-      // Cargar canciones
-      const savedSongs = localStorage.getItem('admin_songs')
-      if (savedSongs) {
-        songs.value = JSON.parse(savedSongs)
-      } else {
-        songs.value = [...defaultSongs]
+      const firebase = useFirebaseIfAvailable()
+      if (!firebase.available || !firebase.loadMedia) {
+        throw new Error('Firebase no disponible')
       }
 
-      // Cargar videos
-      const savedVideos = localStorage.getItem('admin_videos')
-      if (savedVideos) {
-        videos.value = JSON.parse(savedVideos)
-      } else {
-        videos.value = [...defaultVideos]
-      }
+      const firebaseMedia = await firebase.loadMedia()
+      if (firebaseMedia && (firebaseMedia.songs.length > 0 || firebaseMedia.videos.length > 0)) {
+        // Mapear y validar datos de Firebase a tipos correctos
+        songs.value = firebaseMedia.songs.map((song: any) => ({
+          id: song.id,
+          title: song.title || 'Sin título',
+          artist: song.artist || 'Andy Jaque',
+          album: song.album || 'Melodías del Alma',
+          duration: song.duration || 240,
+          audioUrl: song.audioUrl || '/audio/background-music.mp3',
+          genre: song.genre || 'Cumbia',
+          releaseDate: song.releaseDate || new Date(),
+          isActive: song.isActive ?? true,
+          isFeatured: song.isFeatured ?? false,
+          order: song.order || 1,
+          description: song.description || ''
+        }))
 
-      // Cargar playlists
-      const savedPlaylists = localStorage.getItem('admin_playlists')
-      if (savedPlaylists) {
-        playlists.value = JSON.parse(savedPlaylists)
-      } else {
-        playlists.value = [...defaultPlaylists]
-      }
+        videos.value = firebaseMedia.videos.map((video: any) => ({
+          id: video.id,
+          title: video.title || 'Sin título',
+          description: video.description || '',
+          videoUrl: video.videoUrl || '',
+          thumbnailUrl: video.thumbnailUrl || '',
+          duration: video.duration || 240,
+          category: video.category || 'music_video',
+          releaseDate: video.releaseDate || new Date(),
+          isActive: video.isActive ?? true,
+          isFeatured: video.isFeatured ?? false,
+          order: video.order || 1,
+          viewCount: video.viewCount || 0
+        }))
 
-      // Cargar configuración del reproductor
-      const savedPlayerSettings = localStorage.getItem('admin_player_settings')
-      if (savedPlayerSettings) {
-        playerSettings.value = JSON.parse(savedPlayerSettings)
-      } else {
-        playerSettings.value = { ...defaultPlayerSettings }
+        playlists.value = firebaseMedia.playlists.map((playlist: any) => ({
+          id: playlist.id,
+          name: playlist.name || 'Sin nombre',
+          description: playlist.description || '',
+          coverUrl: playlist.coverUrl || '',
+          songs: playlist.songs || [],
+          isActive: playlist.isActive ?? true,
+          isPublic: playlist.isPublic ?? true,
+          order: playlist.order || 1,
+          createdAt: playlist.createdAt || new Date(),
+          updatedAt: playlist.updatedAt || new Date()
+        })) || []
       }
-
-      await saveMediaToStorage()
     } catch (err) {
-      error.value = 'Error al cargar multimedia'
+      error.value = 'Error al cargar multimedia desde Firebase'
       console.error('Error loading media:', err)
-      // En caso de error, cargar datos por defecto
-      songs.value = [...defaultSongs]
-      videos.value = [...defaultVideos]
-      playlists.value = [...defaultPlaylists]
-      playerSettings.value = { ...defaultPlayerSettings }
-      await saveMediaToStorage()
+      songs.value = []
+      videos.value = []
+      playlists.value = []
     } finally {
       loading.value = false
     }
   }
 
-  // Guardar multimedia en localStorage
+  // Guardar multimedia en Firebase
   const saveMediaToStorage = async () => {
     try {
-      localStorage.setItem('admin_songs', JSON.stringify(songs.value))
-      localStorage.setItem('admin_videos', JSON.stringify(videos.value))
-      localStorage.setItem('admin_playlists', JSON.stringify(playlists.value))
-      localStorage.setItem('admin_player_settings', JSON.stringify(playerSettings.value))
+      const firebase = useFirebaseIfAvailable()
+      if (firebase.available && firebase.saveMedia) {
+        await firebase.saveMedia(songs.value, videos.value, playlists.value)
+      } else {
+        throw new Error('Firebase no disponible para guardar')
+      }
     } catch (err) {
       console.error('Error saving media:', err)
+      throw err
     }
   }
 
-  // ========== GESTIÓN DE CANCIONES ==========
+  // === FUNCIONES PARA CANCIONES ===
   const createSong = async (songData: Omit<Song, 'id'>) => {
     saving.value = true
     error.value = ''
@@ -218,6 +142,7 @@ export const useAdminMedia = () => {
 
       songs.value.push(newSong)
       await saveMediaToStorage()
+      await reorderSongs()
       return { success: true, data: newSong }
     } catch (err) {
       error.value = 'Error al crear la canción'
@@ -239,6 +164,7 @@ export const useAdminMedia = () => {
 
       songs.value[index] = { ...songs.value[index], ...songData }
       await saveMediaToStorage()
+      await reorderSongs()
       return { success: true, data: songs.value[index] }
     } catch (err) {
       error.value = 'Error al actualizar la canción'
@@ -258,11 +184,6 @@ export const useAdminMedia = () => {
         throw new Error('Canción no encontrada')
       }
 
-      // Remover de playlists
-      playlists.value.forEach(playlist => {
-        playlist.songs = playlist.songs.filter(id => id !== songId)
-      })
-
       songs.value.splice(index, 1)
       await saveMediaToStorage()
       return { success: true }
@@ -274,7 +195,7 @@ export const useAdminMedia = () => {
     }
   }
 
-  // ========== GESTIÓN DE VIDEOS ==========
+  // === FUNCIONES PARA VIDEOS ===
   const createVideo = async (videoData: Omit<Video, 'id'>) => {
     saving.value = true
     error.value = ''
@@ -287,6 +208,7 @@ export const useAdminMedia = () => {
 
       videos.value.push(newVideo)
       await saveMediaToStorage()
+      await reorderVideos()
       return { success: true, data: newVideo }
     } catch (err) {
       error.value = 'Error al crear el video'
@@ -308,6 +230,7 @@ export const useAdminMedia = () => {
 
       videos.value[index] = { ...videos.value[index], ...videoData }
       await saveMediaToStorage()
+      await reorderVideos()
       return { success: true, data: videos.value[index] }
     } catch (err) {
       error.value = 'Error al actualizar el video'
@@ -338,168 +261,42 @@ export const useAdminMedia = () => {
     }
   }
 
-  // ========== GESTIÓN DE PLAYLISTS ==========
-  const createPlaylist = async (playlistData: Omit<Playlist, 'id' | 'createdAt' | 'updatedAt'>) => {
-    saving.value = true
-    error.value = ''
-
-    try {
-      const now = new Date()
-      const newPlaylist: Playlist = {
-        ...playlistData,
-        id: Date.now().toString(),
-        createdAt: now,
-        updatedAt: now
+  // === FUNCIONES DE UTILIDAD ===
+  const reorderSongs = async () => {
+    songs.value.sort((a, b) => a.order - b.order)
       }
 
-      playlists.value.push(newPlaylist)
-      await saveMediaToStorage()
-      return { success: true, data: newPlaylist }
-    } catch (err) {
-      error.value = 'Error al crear la playlist'
-      return { success: false, error: error.value }
-    } finally {
-      saving.value = false
-    }
+  const reorderVideos = async () => {
+    videos.value.sort((a, b) => a.order - b.order)
   }
 
-  const updatePlaylist = async (playlistId: string, playlistData: Partial<Omit<Playlist, 'id' | 'createdAt'>>) => {
-    saving.value = true
-    error.value = ''
+  // === DATOS COMPUTADOS ===
+  const activeSongs = computed(() => 
+    songs.value.filter(song => song.isActive)
+  )
 
-    try {
-      const index = playlists.value.findIndex(p => p.id === playlistId)
-      if (index === -1) {
-        throw new Error('Playlist no encontrada')
-      }
+  const activeVideos = computed(() => 
+    videos.value.filter(video => video.isActive)
+  )
 
-      playlists.value[index] = { 
-        ...playlists.value[index], 
-        ...playlistData,
-        updatedAt: new Date()
-      }
-      await saveMediaToStorage()
-      return { success: true, data: playlists.value[index] }
-    } catch (err) {
-      error.value = 'Error al actualizar la playlist'
-      return { success: false, error: error.value }
-    } finally {
-      saving.value = false
-    }
-  }
+  const featuredSongs = computed(() => 
+    songs.value.filter(song => song.isFeatured && song.isActive)
+  )
 
-  const deletePlaylist = async (playlistId: string) => {
-    saving.value = true
-    error.value = ''
+  const featuredVideos = computed(() => 
+    videos.value.filter(video => video.isFeatured && video.isActive)
+  )
 
-    try {
-      const index = playlists.value.findIndex(p => p.id === playlistId)
-      if (index === -1) {
-        throw new Error('Playlist no encontrada')
-      }
-
-      playlists.value.splice(index, 1)
-      await saveMediaToStorage()
-      return { success: true }
-    } catch (err) {
-      error.value = 'Error al eliminar la playlist'
-      return { success: false, error: error.value }
-    } finally {
-      saving.value = false
-    }
-  }
-
-  // ========== CONFIGURACIÓN DEL REPRODUCTOR ==========
-  const updatePlayerSettings = async (settings: Partial<PlayerSettings>) => {
-    saving.value = true
-    error.value = ''
-
-    try {
-      playerSettings.value = { 
-        ...playerSettings.value!, 
-        ...settings 
-      }
-      await saveMediaToStorage()
-      return { success: true, data: playerSettings.value }
-    } catch (err) {
-      error.value = 'Error al actualizar configuración'
-      return { success: false, error: error.value }
-    } finally {
-      saving.value = false
-    }
-  }
-
-  // ========== UTILIDADES ==========
-  const formatDuration = (seconds: number) => {
-    const minutes = Math.floor(seconds / 60)
-    const remainingSeconds = seconds % 60
-    return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
-  }
-
-  const validateSong = (songData: Partial<Song>) => {
-    const errors: string[] = []
-
-    if (!songData.title?.trim()) {
-      errors.push('El título es requerido')
-    }
-
-    if (!songData.artist?.trim()) {
-      errors.push('El artista es requerido')
-    }
-
-    if (!songData.duration || songData.duration <= 0) {
-      errors.push('La duración debe ser mayor a 0')
-    }
-
-    if (!songData.audioUrl?.trim()) {
-      errors.push('La URL del audio es requerida')
-    }
-
-    return {
-      isValid: errors.length === 0,
-      errors
-    }
-  }
-
-  const validateVideo = (videoData: Partial<Video>) => {
-    const errors: string[] = []
-
-    if (!videoData.title?.trim()) {
-      errors.push('El título es requerido')
-    }
-
-    if (!videoData.videoUrl?.trim()) {
-      errors.push('La URL del video es requerida')
-    }
-
-    if (!videoData.duration || videoData.duration <= 0) {
-      errors.push('La duración debe ser mayor a 0')
-    }
-
-    return {
-      isValid: errors.length === 0,
-      errors
-    }
-  }
-
-  // Obtener estadísticas
-  const getMediaStats = computed(() => {
-    const activeSongs = songs.value.filter(s => s.isActive).length
-    const activeVideos = videos.value.filter(v => v.isActive).length
-    const activePlaylists = playlists.value.filter(p => p.isActive).length
-    const totalDuration = songs.value.reduce((sum, song) => sum + song.duration, 0)
-
-    return {
-      activeSongs,
-      activeVideos,
-      activePlaylists,
+  // === ESTADÍSTICAS ===
+  const mediaStats = computed(() => ({
       totalSongs: songs.value.length,
+    activeSongs: activeSongs.value.length,
+    featuredSongs: featuredSongs.value.length,
       totalVideos: videos.value.length,
-      totalPlaylists: playlists.value.length,
-      totalDuration,
-      formattedTotalDuration: formatDuration(totalDuration)
-    }
-  })
+    activeVideos: activeVideos.value.length,
+    featuredVideos: featuredVideos.value.length,
+    totalPlaylists: playlists.value.length
+  }))
 
   return {
     // Estado
@@ -511,23 +308,28 @@ export const useAdminMedia = () => {
     saving: readonly(saving),
     error: readonly(error),
 
+    // Datos computados
+    activeSongs,
+    activeVideos,
+    featuredSongs,
+    featuredVideos,
+    mediaStats,
+
     // Acciones
     loadMedia,
+    
+    // Canciones
     createSong,
     updateSong,
     deleteSong,
+    
+    // Videos
     createVideo,
     updateVideo,
     deleteVideo,
-    createPlaylist,
-    updatePlaylist,
-    deletePlaylist,
-    updatePlayerSettings,
 
     // Utilidades
-    formatDuration,
-    validateSong,
-    validateVideo,
-    getMediaStats
+    reorderSongs,
+    reorderVideos
   }
 } 

@@ -637,15 +637,34 @@ const {
   createProductionService,
   updateProductionService,
   deleteProductionService,
-  resetToDefaults,
-  verifyAndRepairData,
   formatPrice,
   calculateDiscount,
-  validatePrice,
   getPriceStats
 } = useAdminPrices()
 
 const { success, error: notifyError } = useNotifications()
+
+// Función de validación local
+const validatePrice = (data: any) => {
+  const errors: string[] = []
+  
+  if (!data.name || data.name.trim().length === 0) {
+    errors.push('El nombre es requerido')
+  }
+  
+  if (!data.currentPrice || data.currentPrice <= 0) {
+    errors.push('El precio actual debe ser mayor a 0')
+  }
+  
+  if (data.originalPrice && data.originalPrice < data.currentPrice) {
+    errors.push('El precio original no puede ser menor al precio actual')
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors
+  }
+}
 
 // State
 const activeTab = ref<'courses' | 'production'>('courses')

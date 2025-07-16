@@ -119,7 +119,7 @@
 <script setup lang="ts">
 // 🎯 DATOS DINÁMICOS DESDE EL PANEL DE ADMIN
 // Ahora los eventos se gestionan desde /admin/events
-const { loadEvents, getUpcomingEvents } = useAdminEvents()
+const { loadEvents, upcomingEvents } = useAdminEvents()
 
 // Cargar eventos al montar el componente
 onMounted(async () => {
@@ -127,7 +127,7 @@ onMounted(async () => {
 })
 
 // Eventos dinámicos desde el panel de administración
-const events = computed(() => getUpcomingEvents.value)
+const events = computed(() => upcomingEvents.value)
 
 const formatMonth = (date: Date) => {
   return date.toLocaleDateString('es-ES', { month: 'short' }).toUpperCase()

@@ -44,7 +44,7 @@
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-gray-400 text-sm">Canciones Activas</p>
-                  <p class="text-2xl font-bold text-white">{{ mediaStats.activeSongs }}</p>
+                  <p class="text-2xl font-bold text-white">{{ enhancedMediaStats.activeSongs }}</p>
                 </div>
                 <div class="text-blue-400 text-2xl">🎵</div>
               </div>
@@ -54,7 +54,7 @@
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-gray-400 text-sm">Videos Activos</p>
-                  <p class="text-2xl font-bold text-green-400">{{ mediaStats.activeVideos }}</p>
+                  <p class="text-2xl font-bold text-green-400">{{ enhancedMediaStats.activeVideos }}</p>
                 </div>
                 <div class="text-green-400 text-2xl">🎬</div>
               </div>
@@ -64,7 +64,7 @@
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-gray-400 text-sm">Playlists Activas</p>
-                  <p class="text-2xl font-bold text-purple-400">{{ mediaStats.activePlaylists }}</p>
+                  <p class="text-2xl font-bold text-purple-400">{{ enhancedMediaStats.activePlaylists }}</p>
                 </div>
                 <div class="text-purple-400 text-2xl">📝</div>
               </div>
@@ -74,7 +74,7 @@
               <div class="flex items-center justify-between">
                 <div>
                   <p class="text-gray-400 text-sm">Duración Total</p>
-                  <p class="text-2xl font-bold text-orange-400">{{ mediaStats.formattedTotalDuration }}</p>
+                                      <p class="text-2xl font-bold text-orange-400">{{ enhancedMediaStats.formattedTotalDuration }}</p>
                 </div>
                 <div class="text-orange-400 text-2xl">⏱️</div>
               </div>
@@ -1009,6 +1009,7 @@ const {
   loading,
   saving,
   error,
+  mediaStats,
   loadMedia,
   createSong,
   updateSong,
@@ -1016,14 +1017,8 @@ const {
   createVideo,
   updateVideo,
   deleteVideo,
-  createPlaylist,
-  updatePlaylist,
-  deletePlaylist,
-  updatePlayerSettings,
-  formatDuration,
-  validateSong,
-  validateVideo,
-  getMediaStats
+  reorderSongs,
+  reorderVideos
 } = useAdminMedia()
 
 const { success, error: notifyError } = useNotifications()
@@ -1136,8 +1131,63 @@ const settingsForm = ref<PlayerSettings>({
   crossfade: 3
 })
 
-// Computed
-const mediaStats = computed(() => getMediaStats.value)
+// Funciones auxiliares locales
+const formatDuration = (seconds: number) => {
+  const minutes = Math.floor(seconds / 60)
+  const remainingSeconds = seconds % 60
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
+}
+
+const validateSong = (song: any) => {
+  const errors: string[] = []
+  if (!song.title?.trim()) errors.push('El título es obligatorio')
+  if (!song.artist?.trim()) errors.push('El artista es obligatorio')
+  if (!song.audioUrl?.trim()) errors.push('La URL de audio es obligatoria')
+  if (song.duration <= 0) errors.push('La duración debe ser mayor a 0')
+  return {
+    isValid: errors.length === 0,
+    errors
+  }
+}
+
+const validateVideo = (video: any) => {
+  const errors: string[] = []
+  if (!video.title?.trim()) errors.push('El título es obligatorio')
+  if (!video.videoUrl?.trim()) errors.push('La URL del video es obligatoria')
+  if (video.duration <= 0) errors.push('La duración debe ser mayor a 0')
+  return {
+    isValid: errors.length === 0,
+    errors
+  }
+}
+
+// Funciones de playlist (simplificadas)
+const createPlaylist = async (playlistData: any) => {
+  console.log('Funcionalidad de playlist pendiente de implementar')
+  return { success: false, error: 'Funcionalidad no implementada' }
+}
+
+const updatePlaylist = async (id: string, data: any) => {
+  console.log('Funcionalidad de playlist pendiente de implementar')
+  return { success: false, error: 'Funcionalidad no implementada' }
+}
+
+const deletePlaylist = async (id: string) => {
+  console.log('Funcionalidad de playlist pendiente de implementar')
+  return { success: false, error: 'Funcionalidad no implementada' }
+}
+
+const updatePlayerSettings = async (settings: any) => {
+  console.log('Funcionalidad de configuración pendiente de implementar')
+  return { success: false, error: 'Funcionalidad no implementada' }
+}
+
+// Computed con las estadísticas mejoradas
+const enhancedMediaStats = computed(() => ({
+  ...mediaStats.value,
+  activePlaylists: playlists.value.filter(p => p.isActive).length,
+  formattedTotalDuration: formatDuration(songs.value.reduce((sum, song) => sum + song.duration, 0))
+}))
 
 // Validación de URL de YouTube
 const isValidYouTubeUrl = computed(() => {

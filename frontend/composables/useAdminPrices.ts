@@ -11,173 +11,99 @@ export const useAdminPrices = () => {
   const saving = ref(false)
   const error = ref('')
 
-  // Datos por defecto para cursos
-  const defaultCoursePrices: CoursePrice[] = [
-    {
-      id: 'basic',
-      name: 'BÁSICO',
-      originalPrice: 45000,
-      currentPrice: 30000,
-      discountPercentage: 33,
-      description: 'Perfecto para empezar',
-      duration: 'clase individual',
-      features: [
-        'Clase individual 1 hora',
-        'Presencial u online',
-        'Material didáctico incluido',
-        'Grabación de la clase',
-        'Seguimiento personalizado'
-      ],
-      isActive: true,
-      isPopular: false
-    },
-    {
-      id: 'intermediate',
-      name: 'INTERMEDIO',
-      originalPrice: 140000,
-      currentPrice: 100000,
-      discountPercentage: 29,
-      description: 'Ideal para progreso rápido',
-      duration: '4 clases mensuales',
-      features: [
-        '4 clases mensuales de 1 hora',
-        'Presencial u online',
-        'Material didáctico premium',
-        'Grabación de todas las clases',
-        'Soporte WhatsApp 24/7',
-        'Plan de estudios personalizado'
-      ],
-      isActive: true,
-      isPopular: true
-    },
-    {
-      id: 'premium',
-      name: 'PREMIUM',
-      originalPrice: 240000,
-      currentPrice: 180000,
-      discountPercentage: 25,
-      description: 'Para músicos serios',
-      duration: '8 clases mensuales',
-      features: [
-        '8 clases mensuales de 1 hora',
-        'Presencial u online',
-        'Material didáctico premium',
-        'Grabación de todas las clases',
-        'Soporte WhatsApp 24/7',
-        'Plan de estudios personalizado',
-        'Acceso a grupo VIP de estudiantes',
-        'Masterclass grupales mensuales'
-      ],
-      isActive: true,
-      isPopular: false
+  // Función para usar Firebase
+  const useFirebaseIfAvailable = () => {
+    try {
+      // Intentar usar Firebase global primero (para páginas públicas)
+      const globalFirebase = useFirebaseGlobal()
+      if (globalFirebase.isAvailable.value) {
+        return { 
+          loadPrices: globalFirebase.loadPrices,
+          available: true,
+          isGlobal: true
+        }
+      }
+      
+      // Fallback: usar admin Firebase (para páginas admin)
+      const { loadPrices: loadFirebasePrices, savePrices: saveFirebasePrices, isConnected } = useFirestoreAdmin()
+      if (isConnected.value) {
+        return { 
+          loadPrices: loadFirebasePrices,
+          savePrices: saveFirebasePrices,
+          available: true,
+          isGlobal: false
+        }
+      }
+      
+      return { available: false }
+    } catch (error) {
+      console.error('❌ Firebase no disponible para precios')
+      return { available: false }
     }
-  ]
+  }
 
-  // Datos por defecto para servicios de producción
-  const defaultProductionServices: ProductionService[] = [
-    {
-      id: 'basic-production',
-      name: 'PRODUCCIÓN BÁSICA',
-      originalPrice: 220000,
-      currentPrice: 150000,
-      discountPercentage: 32,
-      description: 'Ideal para demos y maquetas',
-      deliveryTime: '7 días',
-      includes: [
-        'Grabación básica (hasta 5 pistas)',
-        'Arreglos simples',
-        'Mezcla básica',
-        'Master básico',
-        'Entrega en 7 días'
-      ],
-      isActive: true,
-      category: 'full_production'
-    },
-    {
-      id: 'professional-production',
-      name: 'PRODUCCIÓN PROFESIONAL',
-      originalPrice: 420000,
-      currentPrice: 300000,
-      discountPercentage: 29,
-      description: 'Calidad radio y streaming',
-      deliveryTime: '10-12 días',
-      includes: [
-        'Grabación profesional (hasta 15 pistas)',
-        'Arreglos avanzados',
-        'Mezcla profesional',
-        'Master profesional',
-        'Sesión de revisión incluida',
-        'Entrega en múltiples formatos'
-      ],
-      isActive: true,
-      category: 'full_production'
-    },
-    {
-      id: 'premium-production',
-      name: 'PRODUCCIÓN PREMIUM',
-      originalPrice: 650000,
-      currentPrice: 450000,
-      discountPercentage: 31,
-      description: 'Máximo nivel profesional',
-      deliveryTime: '15-20 días',
-      includes: [
-        'Grabación premium (pistas ilimitadas)',
-        'Arreglos complejos y creativos',
-        'Mezcla premium con múltiples revisiones',
-        'Master premium para todos los formatos',
-        'Sesiones de revisión ilimitadas',
-        'Entrega física en CD/Vinyl ready',
-        'Soporte post-entrega 30 días'
-      ],
-      isActive: true,
-      category: 'full_production'
-    }
-  ]
-
-  // Cargar precios desde localStorage
+  // Cargar precios desde Firebase
   const loadPrices = async () => {
     loading.value = true
     error.value = ''
     
     try {
-      // Cargar precios de cursos
-      const savedCoursePrices = localStorage.getItem('admin_course_prices')
-      if (savedCoursePrices) {
-        coursePrices.value = JSON.parse(savedCoursePrices)
-      } else {
-        coursePrices.value = [...defaultCoursePrices]
+      const firebase = useFirebaseIfAvailable()
+      if (!firebase.available || !firebase.loadPrices) {
+        throw new Error('Firebase no disponible')
       }
 
-      // Cargar servicios de producción
-      const savedProductionServices = localStorage.getItem('admin_production_services')
-      if (savedProductionServices) {
-        productionServices.value = JSON.parse(savedProductionServices)
-      } else {
-        productionServices.value = [...defaultProductionServices]
+      const firebasePrices = await firebase.loadPrices()
+      if (firebasePrices && (firebasePrices.courses.length > 0 || firebasePrices.services.length > 0)) {
+        // Mapear y validar datos de Firebase a tipos correctos
+        coursePrices.value = firebasePrices.courses.map((course: any) => ({
+          id: course.id,
+          name: course.name || 'Sin nombre',
+          originalPrice: course.originalPrice || 0,
+          currentPrice: course.currentPrice || 0,
+          discountPercentage: course.discountPercentage || 0,
+          description: course.description || '',
+          duration: course.duration || '',
+          features: course.features || [],
+          isActive: course.isActive ?? true,
+          isPopular: course.isPopular ?? false
+        }))
+        
+        productionServices.value = firebasePrices.services.map((service: any) => ({
+          id: service.id,
+          name: service.name || 'Sin nombre',
+          originalPrice: service.originalPrice || 0,
+          currentPrice: service.currentPrice || 0,
+          discountPercentage: service.discountPercentage || 0,
+          description: service.description || '',
+          deliveryTime: service.deliveryTime || '',
+          includes: service.includes || [],
+          isActive: service.isActive ?? true,
+          category: service.category || 'full_production'
+        }))
       }
-
-      // Verificar y reparar datos después de cargar
-      await verifyAndRepairData()
-      
     } catch (err) {
-      error.value = 'Error al cargar los precios'
+      error.value = 'Error al cargar precios desde Firebase'
       console.error('Error loading prices:', err)
-      // En caso de error, cargar datos por defecto
-      coursePrices.value = [...defaultCoursePrices]
-      productionServices.value = [...defaultProductionServices]
-      await savePricesToStorage()
+      coursePrices.value = []
+      productionServices.value = []
     } finally {
       loading.value = false
     }
   }
 
-  // Guardar precios en localStorage
+  // Guardar precios en Firebase
   const savePricesToStorage = async () => {
     try {
-      localStorage.setItem('admin_course_prices', JSON.stringify(coursePrices.value))
-      localStorage.setItem('admin_production_services', JSON.stringify(productionServices.value))
+      const firebase = useFirebaseIfAvailable()
+      if (firebase.available && firebase.savePrices) {
+        await firebase.savePrices(coursePrices.value, productionServices.value)
+      } else {
+        throw new Error('Firebase no disponible para guardar')
+      }
     } catch (err) {
       console.error('Error saving prices:', err)
+      throw err
     }
   }
 
@@ -313,32 +239,6 @@ export const useAdminPrices = () => {
     }
   }
 
-  // Función de validación
-  const validatePrice = (priceData: Partial<CoursePrice | ProductionService>) => {
-    const errors: string[] = []
-
-    if (!priceData.name?.trim()) {
-      errors.push('El nombre es requerido')
-    }
-
-    if (!priceData.currentPrice || priceData.currentPrice <= 0) {
-      errors.push('El precio actual debe ser mayor a 0')
-    }
-
-    if (!priceData.originalPrice || priceData.originalPrice <= 0) {
-      errors.push('El precio original debe ser mayor a 0')
-    }
-
-    if (priceData.currentPrice && priceData.originalPrice && priceData.currentPrice > priceData.originalPrice) {
-      errors.push('El precio actual no puede ser mayor al precio original')
-    }
-
-    return {
-      isValid: errors.length === 0,
-      errors
-    }
-  }
-
   // Calcular descuento automáticamente
   const calculateDiscount = (originalPrice: number, currentPrice: number) => {
     if (originalPrice <= 0 || currentPrice <= 0) return 0
@@ -375,46 +275,6 @@ export const useAdminPrices = () => {
     }
   })
 
-  // Función para resetear datos a valores por defecto
-  const resetToDefaults = async () => {
-    loading.value = true
-    try {
-      coursePrices.value = [...defaultCoursePrices]
-      productionServices.value = [...defaultProductionServices]
-      await savePricesToStorage()
-      return { success: true }
-    } catch (err) {
-      error.value = 'Error al resetear los datos'
-      return { success: false, error: error.value }
-    } finally {
-      loading.value = false
-    }
-  }
-
-  // Función para verificar y reparar datos
-  const verifyAndRepairData = async () => {
-    try {
-      // Verificar si los datos de producción están vacíos o corruptos
-      if (productionServices.value.length === 0) {
-        console.log('Reparando datos de servicios de producción...')
-        productionServices.value = [...defaultProductionServices]
-        await savePricesToStorage()
-      }
-
-      // Verificar si los datos de cursos están vacíos o corruptos
-      if (coursePrices.value.length === 0) {
-        console.log('Reparando datos de cursos...')
-        coursePrices.value = [...defaultCoursePrices]
-        await savePricesToStorage()
-      }
-
-      return { success: true }
-    } catch (err) {
-      console.error('Error al verificar y reparar datos:', err)
-      return { success: false, error: 'Error al reparar datos' }
-    }
-  }
-
   return {
     // Estado
     coursePrices: readonly(coursePrices),
@@ -431,11 +291,8 @@ export const useAdminPrices = () => {
     createProductionService,
     updateProductionService,
     deleteProductionService,
-    resetToDefaults,
-    verifyAndRepairData,
 
     // Utilidades
-    validatePrice,
     calculateDiscount,
     formatPrice,
     getPriceStats

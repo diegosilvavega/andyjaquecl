@@ -71,14 +71,7 @@ export interface Biography {
   updatedAt: Date
 }
 
-export interface Statistic {
-  id: string
-  label: string
-  value: string | number
-  icon: string
-  description: string
-  order: number
-}
+
 
 // ========== MÚSICA ==========
 export interface MusicLink {
@@ -283,25 +276,9 @@ export interface PlayerSettings {
   crossfade: number // seconds
 }
 
-// ========== CONTACTOS PROFESIONALES ==========
-export interface ProfessionalContact {
-  id: string
-  type: 'manager' | 'booking' | 'press' | 'label' | 'publisher'
-  name: string
-  email: string
-  phone?: string
-  company?: string
-  role?: string
-  isPublic: boolean
-  order: number
-  notes?: string
-  updatedAt: Date
-}
-
 export interface ContactSettings {
   showContactForm: boolean
   showSocialMedia: boolean
-  showProfessionalContacts: boolean
   contactFormEmail: string
   autoReplyEnabled: boolean
   autoReplyMessage?: string

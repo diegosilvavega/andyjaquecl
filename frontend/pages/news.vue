@@ -118,31 +118,7 @@
       </div>
     </section>
 
-    <!-- Tour Dates Section -->
-    <section class="py-16 bg-gray-800">
-      <div class="container mx-auto px-4">
-        <div class="max-w-4xl mx-auto text-center">
-          <h3 class="text-2xl md:text-3xl font-capture text-yellow-400 mb-8">
-            PRÓXIMAS FECHAS DEL TOUR
-          </h3>
-          <div class="bg-gray-700 rounded-xl p-6 mb-8">
-            <p class="text-gray-300 font-body mb-4">Tour Jaqueando la Cumbia 2025:</p>
-            <p>15 JUL - Viña del Mar (Festival de Invierno)</p>
-            <p>22 JUL - Santiago (Teatro Caupolicán)</p>
-            <p>29 JUL - Concepción (Teatro Universidad de Concepción)</p>
-            <p>5 AGO - Valparaíso (Anfiteatro del Mar)</p>
-            <p>9 AGO - Antofagasta (Enjoy Antofagasta)</p>
-            <p>Y muchas más...</p>
-          </div>
-          <NuxtLink
-            to="/"
-            class="inline-block mt-6 bg-yellow-400 text-black px-6 py-3 rounded-lg font-capture hover:bg-yellow-300 transition-colors"
-          >
-            VER TODAS LAS FECHAS
-          </NuxtLink>
-        </div>
-      </div>
-    </section>
+
 
     <!-- Social Media Updates -->
     <section class="py-16">
@@ -191,15 +167,12 @@
 
 <script setup lang="ts">
 // 🎯 DATOS DINÁMICOS DESDE EL PANEL DE ADMIN
-const { loadContent, getPublishedNews, loading } = useAdminContent()
+const { loadContent, publishedNews, loading } = useAdminContent()
 
 // Cargar contenido al montar la página
 onMounted(async () => {
   await loadContent()
 })
-
-// Noticias publicadas desde el panel de administración
-const publishedNews = computed(() => getPublishedNews.value)
 
 // Funciones de utilidad
 const formatDate = (date: Date | string) => {

@@ -60,8 +60,8 @@
             <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-gray-400 text-sm">Próximos</p>
-                  <p class="text-2xl font-bold text-green-400">{{ eventStats.upcoming }}</p>
+                  <p class="text-gray-400 text-sm">Total</p>
+                  <p class="text-2xl font-bold text-green-400">{{ eventStats.total }}</p>
                 </div>
                 <div class="text-green-400 text-2xl">🎤</div>
               </div>
@@ -114,7 +114,7 @@
                   class="border-b border-gray-700 hover:bg-gray-700/50 transition-colors"
                 >
                   <td class="p-4">
-                    <div class="text-white font-bold">{{ formatShortDate(event.date) }}</div>
+                    <div class="text-white font-bold">{{ formatShortDateLocal(event.date) }}</div>
                     <div class="text-gray-400 text-sm">{{ event.time }}</div>
                   </td>
                   <td class="p-4">
@@ -457,9 +457,9 @@ const {
   createEvent,
   updateEvent,
   deleteEvent,
-  getEventStats,
-  formatShortDate,
-  validateEvent
+  eventStats,
+  toggleEventStatus,
+  reorderEvents
 } = useAdminEvents()
 
 const { success, error: notifyError } = useNotifications()
@@ -501,7 +501,7 @@ const eventForm = ref<{
 const formErrors = ref<string[]>([])
 
 // Computed
-const eventStats = computed(() => getEventStats.value)
+// eventStats ya viene del composable, no necesitamos redefinirlo
 
 // Methods
 const getStatusText = (status: string) => {
@@ -511,6 +511,40 @@ const getStatusText = (status: string) => {
     'sold_out': 'Agotado'
   }
   return statusMap[status as keyof typeof statusMap] || status
+}
+
+// Función para formatear fecha corta
+const formatShortDateLocal = (date: Date) => {
+  return date.toLocaleDateString('es-ES', { 
+    day: '2-digit', 
+    month: 'short' 
+  }).toUpperCase()
+}
+
+// Función para validar datos del evento
+const validateEventData = (eventData: any) => {
+  const errors: string[] = []
+  
+  if (!eventData.venue.trim()) {
+    errors.push('El lugar es requerido')
+  }
+  
+  if (!eventData.city.trim()) {
+    errors.push('La ciudad es requerida')
+  }
+  
+  if (!eventData.dateString) {
+    errors.push('La fecha es requerida')
+  }
+  
+  if (!eventData.time.trim()) {
+    errors.push('La hora es requerida')
+  }
+  
+  return {
+    isValid: errors.length === 0,
+    errors
+  }
 }
 
 const openCreateModal = () => {
@@ -579,7 +613,7 @@ const saveEvent = async () => {
   }
 
   // Validate
-  const validation = validateEvent(eventData)
+  const validation = validateEventData(eventData)
   if (!validation.isValid) {
     formErrors.value = validation.errors
     return

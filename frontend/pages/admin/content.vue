@@ -39,7 +39,7 @@
       <div v-else>
         <!-- Quick Stats -->
         <section class="mb-8">
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
             <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
               <div class="flex items-center justify-between">
                 <div>
@@ -53,22 +53,14 @@
             <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
               <div class="flex items-center justify-between">
                 <div>
-                  <p class="text-gray-400 text-sm">Noticias Nuevas</p>
-                  <p class="text-2xl font-bold text-green-400">{{ contentStats.newNews }}</p>
+                  <p class="text-gray-400 text-sm">Total Noticias</p>
+                  <p class="text-2xl font-bold text-green-400">{{ contentStats.totalNews }}</p>
                 </div>
                 <div class="text-green-400 text-2xl">✨</div>
               </div>
             </div>
 
-            <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
-              <div class="flex items-center justify-between">
-                <div>
-                  <p class="text-gray-400 text-sm">Estadísticas</p>
-                  <p class="text-2xl font-bold text-purple-400">{{ contentStats.totalStatistics }}</p>
-                </div>
-                <div class="text-purple-400 text-2xl">📊</div>
-              </div>
-            </div>
+
 
             <div class="bg-gray-800 rounded-xl p-6 border border-gray-700">
               <div class="flex items-center justify-between">
@@ -114,21 +106,7 @@
                 <span>BIOGRAFÍA</span>
               </span>
             </button>
-            <button
-              @click="activeTab = 'statistics'"
-              :class="[
-                'px-6 py-3 rounded-lg font-capture text-sm transition-all duration-300 relative overflow-hidden',
-                activeTab === 'statistics'
-                  ? 'bg-yellow-400 text-black shadow-lg transform scale-105'
-                  : 'text-gray-100 bg-transparent hover:text-yellow-300 hover:bg-gray-700/50'
-              ]"
-            >
-              <span class="relative z-10 flex items-center space-x-2">
-                <span>📊</span>
-                <span>ESTADÍSTICAS</span>
-                <span class="bg-black/20 text-xs px-2 py-1 rounded-full">{{ statistics.length }}</span>
-              </span>
-            </button>
+
           </div>
         </div>
 
@@ -324,65 +302,7 @@
           </div>
         </section>
 
-        <!-- Statistics Tab -->
-        <section v-if="activeTab === 'statistics'" class="bg-gray-800 rounded-xl border border-gray-700">
-          <div class="p-6 border-b border-gray-700 flex justify-between items-center">
-            <h2 class="text-xl font-capture text-yellow-400">Gestión de Estadísticas</h2>
-            <button
-              @click="openStatModal()"
-              class="bg-yellow-400 hover:bg-yellow-500 text-black px-4 py-2 rounded-lg font-capture font-bold transition-colors"
-            >
-              ➕ NUEVA ESTADÍSTICA
-            </button>
-          </div>
 
-          <div class="p-6">
-            <div v-if="statistics.length === 0" class="text-center py-12">
-              <div class="text-gray-400 text-4xl mb-4">📊</div>
-              <p class="text-gray-400 mb-4">No hay estadísticas registradas</p>
-              <button
-                @click="openStatModal()"
-                class="bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-3 rounded-lg font-capture font-bold transition-colors"
-              >
-                ➕ CREAR PRIMERA ESTADÍSTICA
-              </button>
-            </div>
-
-            <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              <div
-                v-for="stat in getOrderedStatistics"
-                :key="stat.id"
-                class="bg-gray-700 rounded-xl p-6 border border-gray-600 hover:border-yellow-400/50 transition-colors"
-              >
-                <div class="flex items-start justify-between mb-4">
-                  <div class="text-center flex-1">
-                    <div class="text-3xl mb-2">{{ stat.icon }}</div>
-                    <div class="text-2xl font-capture text-yellow-400 mb-1">{{ stat.value }}</div>
-                    <h3 class="text-sm font-capture text-white mb-1">{{ stat.label }}</h3>
-                    <p class="text-xs text-gray-400">{{ stat.description }}</p>
-                  </div>
-                  <div class="flex flex-col space-y-1 ml-2">
-                    <button
-                      @click="editStatistic(stat)"
-                      class="bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 hover:text-blue-200 px-2 py-1 rounded text-xs transition-all duration-200 border border-blue-500/20 hover:border-blue-500/40"
-                    >
-                      ✏️
-                    </button>
-                    <button
-                      @click="deleteStatConfirm(stat)"
-                      class="bg-red-500/20 hover:bg-red-500/30 text-red-300 hover:text-red-200 px-2 py-1 rounded text-xs transition-all duration-200 border border-red-500/20 hover:border-red-500/40"
-                    >
-                      🗑️
-                    </button>
-                  </div>
-                </div>
-                <div class="text-xs text-gray-500 text-center">
-                  Orden: {{ stat.order }}
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
       </div>
     </main>
 
@@ -523,114 +443,6 @@
       </div>
     </div>
 
-    <!-- Statistics Modal -->
-    <div 
-      v-if="showStatModal" 
-      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
-      @click.self="closeStatModal"
-    >
-      <div class="bg-gray-800 rounded-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-        <div class="p-6 border-b border-gray-700">
-          <h3 class="text-xl font-capture text-yellow-400">
-            {{ isEditingStat ? 'EDITAR ESTADÍSTICA' : 'NUEVA ESTADÍSTICA' }}
-          </h3>
-        </div>
-
-        <form @submit.prevent="saveStatistic" class="p-6 space-y-6">
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label class="block text-sm font-medium text-gray-300 mb-2">
-                Etiqueta *
-              </label>
-              <input
-                v-model="statForm.label"
-                type="text"
-                required
-                class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors"
-                placeholder="Ej: Oyentes mensuales en Spotify"
-              />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-300 mb-2">
-                Valor *
-              </label>
-              <input
-                v-model="statForm.value"
-                type="text"
-                required
-                class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors"
-                placeholder="Ej: 7,293 o 8"
-              />
-            </div>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-            <div>
-              <label class="block text-sm font-medium text-gray-300 mb-2">
-                Icono (emoji)
-              </label>
-              <input
-                v-model="statForm.icon"
-                type="text"
-                class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors"
-                placeholder="🎵"
-              />
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium text-gray-300 mb-2">
-                Orden *
-              </label>
-              <input
-                v-model.number="statForm.order"
-                type="number"
-                required
-                min="1"
-                class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors"
-                placeholder="1"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">
-              Descripción
-            </label>
-            <input
-              v-model="statForm.description"
-              type="text"
-              class="w-full px-4 py-3 rounded-lg bg-gray-700 border border-gray-600 text-white placeholder-gray-400 focus:border-yellow-400 focus:ring-1 focus:ring-yellow-400 transition-colors"
-              placeholder="Ej: Crecimiento constante en plataformas digitales"
-            />
-          </div>
-
-          <div v-if="statFormErrors.length > 0" class="bg-red-600/20 border border-red-500 rounded-lg p-4">
-            <ul class="text-red-400 text-sm space-y-1">
-              <li v-for="error in statFormErrors" :key="error">• {{ error }}</li>
-            </ul>
-          </div>
-
-          <div class="flex space-x-4 pt-4">
-            <button
-              type="button"
-              @click="closeStatModal"
-              class="flex-1 bg-gray-600 hover:bg-gray-700 text-white px-6 py-3 rounded-lg font-capture transition-colors"
-            >
-              CANCELAR
-            </button>
-            <button
-              type="submit"
-              :disabled="saving"
-              class="flex-1 bg-yellow-400 hover:bg-yellow-500 text-black px-6 py-3 rounded-lg font-capture font-bold transition-colors disabled:opacity-50"
-            >
-              {{ saving ? 'GUARDANDO...' : isEditingStat ? 'ACTUALIZAR' : 'CREAR' }}
-            </button>
-          </div>
-        </form>
-      </div>
-    </div>
-
     <!-- Delete Confirmation Modal -->
     <div 
       v-if="showDeleteModal" 
@@ -669,7 +481,7 @@
 </template>
 
 <script setup lang="ts">
-import type { NewsItem, Biography, Statistic } from '~/types/admin'
+import type { NewsItem, Biography } from '~/types/admin'
 
 // Auth check
 definePageMeta({
@@ -680,7 +492,6 @@ definePageMeta({
 const { 
   news,
   biography,
-  statistics,
   loading, 
   saving, 
   error,
@@ -689,21 +500,13 @@ const {
   updateNews,
   deleteNews,
   updateBiography,
-  createStatistic,
-  updateStatistic,
-  deleteStatistic,
-  validateNews,
-  validateBiography,
-  validateStatistic,
-  formatDate,
-  getContentStats,
-  getOrderedStatistics
+  contentStats
 } = useAdminContent()
 
 const { success, error: notifyError } = useNotifications()
 
 // State
-const activeTab = ref<'news' | 'biography' | 'statistics'>('news')
+const activeTab = ref<'news' | 'biography'>('news')
 
 // News Modal
 const showNewsModal = ref(false)
@@ -748,32 +551,60 @@ const biographyForm = ref<{
 const careerHighlightsText = ref('')
 const biographyFormErrors = ref<string[]>([])
 
-// Statistics Modal
-const showStatModal = ref(false)
-const isEditingStat = ref(false)
-const statForm = ref<{
-  id?: string
-  label: string
-  value: string
-  icon: string
-  description: string
-  order: number | null
-}>({
-  label: '',
-  value: '',
-  icon: '',
-  description: '',
-  order: null
-})
-const statFormErrors = ref<string[]>([])
-
 // Delete Modal
 const showDeleteModal = ref(false)
-const itemToDelete = ref<NewsItem | Statistic | null>(null)
-const deleteType = ref<'news' | 'statistic'>('news')
+const itemToDelete = ref<NewsItem | null>(null)
+const deleteType = ref<'news'>('news')
 
-// Computed
-const contentStats = computed(() => getContentStats.value)
+// Funciones auxiliares
+const formatDate = (date: any) => {
+  if (!date) return 'Sin fecha'
+  
+  try {
+    let d: Date
+    
+    // Manejar diferentes tipos de fecha de Firebase
+    if (date instanceof Date) {
+      d = date
+    } else if (typeof date === 'string') {
+      d = new Date(date)
+    } else if (typeof date === 'object' && date.toDate) {
+      // Timestamp de Firebase
+      d = date.toDate()
+    } else if (typeof date === 'object' && date.seconds) {
+      // Timestamp de Firebase formato objeto
+      d = new Date(date.seconds * 1000)
+    } else {
+      d = new Date(date)
+    }
+    
+    if (isNaN(d.getTime())) return 'Fecha inválida'
+    
+    return d.toLocaleDateString('es-ES', { 
+      year: 'numeric', 
+      month: 'long', 
+      day: 'numeric' 
+    })
+  } catch (error) {
+    console.warn('Error formateando fecha:', error, date)
+    return 'Fecha inválida'
+  }
+}
+
+const validateNews = (newsData: any) => {
+  const errors: string[] = []
+  if (!newsData.title?.trim()) errors.push('El título es requerido')
+  if (!newsData.content?.trim()) errors.push('El contenido es requerido')
+  return { isValid: errors.length === 0, errors }
+}
+
+const validateBiography = (bioData: any) => {
+  const errors: string[] = []
+  if (!bioData.title?.trim()) errors.push('El título es requerido')
+  if (!bioData.mainText?.trim()) errors.push('El texto principal es requerido')
+  return { isValid: errors.length === 0, errors }
+}
+
 
 // News Methods
 const openNewsModal = (newsItem?: NewsItem) => {
@@ -910,87 +741,6 @@ const saveBiography = async () => {
   }
 }
 
-// Statistics Methods
-const openStatModal = (stat?: Statistic) => {
-  isEditingStat.value = !!stat
-  if (stat) {
-    statForm.value = {
-      id: stat.id,
-      label: stat.label,
-      value: stat.value.toString(),
-      icon: stat.icon,
-      description: stat.description,
-      order: stat.order
-    }
-  } else {
-    resetStatForm()
-  }
-  showStatModal.value = true
-}
-
-const closeStatModal = () => {
-  showStatModal.value = false
-  resetStatForm()
-  statFormErrors.value = []
-}
-
-const resetStatForm = () => {
-  statForm.value = {
-    label: '',
-    value: '',
-    icon: '',
-    description: '',
-    order: null
-  }
-}
-
-const editStatistic = (stat: Statistic) => {
-  openStatModal(stat)
-}
-
-const saveStatistic = async () => {
-  statFormErrors.value = []
-  
-  const statData = {
-    label: statForm.value.label,
-    value: statForm.value.value,
-    icon: statForm.value.icon,
-    description: statForm.value.description,
-    order: statForm.value.order || 1
-  }
-
-  const validation = validateStatistic(statData)
-  if (!validation.isValid) {
-    statFormErrors.value = validation.errors
-    return
-  }
-
-  let result
-  if (isEditingStat.value) {
-    result = await updateStatistic(statForm.value.id!, statData)
-  } else {
-    result = await createStatistic(statData as Omit<Statistic, 'id'>)
-  }
-
-  if (result.success) {
-    closeStatModal()
-    if (isEditingStat.value) {
-      success('Estadística actualizada', 'Los cambios se han guardado correctamente')
-    } else {
-      success('Estadística creada', 'La nueva estadística se ha agregado exitosamente')
-    }
-  } else {
-    statFormErrors.value = [result.error || 'Error desconocido']
-    notifyError('Error al guardar', result.error || 'Error desconocido')
-  }
-}
-
-const deleteStatConfirm = (stat: Statistic) => {
-  itemToDelete.value = stat
-  deleteType.value = 'statistic'
-  showDeleteModal.value = true
-}
-
 // Delete Methods
 const closeDeleteModal = () => {
   showDeleteModal.value = false
@@ -1000,19 +750,11 @@ const closeDeleteModal = () => {
 const confirmDelete = async () => {
   if (!itemToDelete.value) return
 
-  let result
-  if (deleteType.value === 'news') {
-    result = await deleteNews(itemToDelete.value.id)
-  } else {
-    result = await deleteStatistic(itemToDelete.value.id)
-  }
+  const result = await deleteNews(itemToDelete.value.id)
 
   if (result.success) {
     closeDeleteModal()
-    success(
-      deleteType.value === 'news' ? 'Noticia eliminada' : 'Estadística eliminada',
-      'El elemento se ha eliminado correctamente'
-    )
+    success('Noticia eliminada', 'La noticia se ha eliminado correctamente')
   } else {
     notifyError('Error al eliminar', result.error || 'Error desconocido')
   }
