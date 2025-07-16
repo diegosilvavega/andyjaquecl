@@ -50,3 +50,10 @@ Thumbs.db
 *.tmp
 *.temp
 .vercel
+
+# Firebase
+*firebase-adminsdk*.json
+.firebase/
+.firebaserc
+firebase-debug.log
+firestore-debug.log
